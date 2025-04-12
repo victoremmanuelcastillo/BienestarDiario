@@ -1,0 +1,116 @@
+<!-- src/app/auth/profile/profile.component.html -->
+<div class="profile-container">
+    <div class="container">
+      <div class="profile-header">
+        <h1>Mi Perfil</h1>
+        <p>Gestiona tu información personal y preferencias</p>
+      </div>
+      
+      <div class="profile-content">
+        <div class="profile-sidebar">
+          <div class="profile-avatar">
+            <div class="avatar-placeholder">
+              <span>👤</span>
+            </div>
+            <button class="btn-outline">Cambiar foto</button>
+          </div>
+          
+          <div class="profile-nav">
+            <ul>
+              <li class="active"><a href="#profile-info">Información personal</a></li>
+              <li><a href="#profile-preferences">Preferencias</a></li>
+              <li><a href="#profile-security">Seguridad</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="profile-main">
+          <div *ngIf="showSuccessMessage" class="success-message">
+            <p>¡Cambios guardados correctamente!</p>
+          </div>
+          
+          <section id="profile-info" class="profile-section">
+            <h2>Información personal</h2>
+            <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+              <div class="form-group">
+                <label for="name">Nombre</label>
+                <input type="text" id="name" formControlName="name">
+                <div *ngIf="nameInvalid" class="error-message">
+                  <p>El nombre es obligatorio</p>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="email">Correo electrónico</label>
+                <input type="email" id="email" formControlName="email">
+                <div *ngIf="emailInvalid" class="error-message">
+                  <p>Ingresa un correo electrónico válido</p>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="bio">Biografía</label>
+                <textarea id="bio" formControlName="bio" rows="4"></textarea>
+              </div>
+              
+              <div class="form-group">
+                <label for="location">Ubicación</label>
+                <input type="text" id="location" formControlName="location">
+              </div>
+              
+              <button type="submit" class="btn-primary">Guardar cambios</button>
+            </form>
+          </section>
+          
+          <section id="profile-preferences" class="profile-section">
+            <h2>Preferencias</h2>
+            <form [formGroup]="preferencesForm" (ngSubmit)="updatePreferences()">
+              <div class="form-group checkbox-group">
+                <input type="checkbox" id="notifications" formControlName="notifications">
+                <label for="notifications">Recibir notificaciones</label>
+              </div>
+              
+              <div class="form-group checkbox-group">
+                <input type="checkbox" id="darkMode" formControlName="darkMode">
+                <label for="darkMode">Modo oscuro</label>
+              </div>
+              
+              <div class="form-group">
+                <label for="language">Idioma</label>
+                <select id="language" formControlName="language">
+                  <option value="es">Español</option>
+                  <option value="en">Inglés</option>
+                  <option value="fr">Francés</option>
+                  <option value="de">Alemán</option>
+                </select>
+              </div>
+              
+              <button type="submit" class="btn-primary">Guardar preferencias</button>
+            </form>
+          </section>
+          
+          <section id="profile-security" class="profile-section">
+            <h2>Seguridad</h2>
+            <form>
+              <div class="form-group">
+                <label for="current-password">Contraseña actual</label>
+                <input type="password" id="current-password">
+              </div>
+              
+              <div class="form-group">
+                <label for="new-password">Nueva contraseña</label>
+                <input type="password" id="new-password">
+              </div>
+              
+              <div class="form-group">
+                <label for="confirm-password">Confirmar contraseña</label>
+                <input type="password" id="confirm-password">
+              </div>
+              
+              <button type="submit" class="btn-primary">Cambiar contraseña</button>
+            </form>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>

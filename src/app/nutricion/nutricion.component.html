@@ -1,0 +1,286 @@
+<div class="nutricion-container">
+    <div class="hero-section">
+      <div class="container">
+        <h1>Nutrición Saludable</h1>
+        <p>Descubre recetas nutritivas y aprende sobre los alimentos que benefician tu salud</p>
+      </div>
+    </div>
+  
+    <div class="container">
+      <div class="section">
+        <h2>Buscar Recetas Saludables</h2>
+        <div class="search-container">
+          <form [formGroup]="searchForm" (ngSubmit)="searchRecipes()">
+            <div class="search-input">
+              <input 
+                type="text" 
+                formControlName="query" 
+                placeholder="Buscar recetas (ej: ensalada, pollo, vegetariano...)"
+              >
+              <button type="submit" class="btn btn-primary">Buscar</button>
+            </div>
+            
+            <div class="filters">
+              <!-- Corregir la estructura anidada incorrecta -->
+              <div class="filter-group">
+                <label for="diet-select">Tipo de dieta:</label>
+                <select id="diet-select" formControlName="diet" aria-label="Seleccionar tipo de dieta">
+                  <option value="">Todas</option>
+                  <option value="balanced">Equilibrada</option>
+                  <option value="high-protein">Alta en proteínas</option>
+                  <option value="low-carb">Baja en carbohidratos</option>
+                  <option value="low-fat">Baja en grasas</option>
+                </select>
+              </div>
+              
+              <div class="filter-group">
+                <label for="health-select">Restricciones:</label>
+                <select id="health-select" formControlName="health" aria-label="Seleccionar restricciones de salud">
+                  <option value="">Ninguna</option>
+                  <option value="vegetarian">Vegetariano</option>
+                  <option value="vegan">Vegano</option>
+                  <option value="gluten-free">Sin gluten</option>
+                  <option value="dairy-free">Sin lácteos</option>
+                  <option value="peanut-free">Sin maní</option>
+                </select>
+              </div>
+              
+              <div class="filter-group">
+                <label for="calories-select">Calorías:</label>
+                <select id="calories-select" formControlName="calories" aria-label="Seleccionar rango de calorías">
+                  <option value="">Cualquiera</option>
+                  <option value="0-300">Menos de 300</option>
+                  <option value="300-500">300-500</option>
+                  <option value="500-700">500-700</option>
+                  <option value="700-900">700-900</option>
+                  <option value="900+">Más de 900</option>
+                </select>
+              </div>
+              <!-- Eliminar las opciones duplicadas que estaban fuera del select -->
+            </div>
+          </form>
+        </div>
+        
+        <div *ngIf="isLoading" class="loading">
+          <div class="spinner"></div>
+          <p>Buscando recetas...</p>
+        </div>
+        
+        <div *ngIf="!isLoading && recipes.length > 0" class="recipes-grid">
+          <div *ngFor="let recipe of recipes" class="recipe-card">
+            <div class="recipe-image">
+              <!-- Corregir la imagen añadiendo title además de alt -->
+              <img [src]="recipe.image" [alt]="recipe.label || 'Imagen de receta'" title="{{recipe.label || 'Imagen de receta'}}">
+              <div class="recipe-labels">
+                <span *ngFor="let label of recipe.dietLabels" class="label diet-label">{{label}}</span>
+                <span *ngFor="let label of recipe.healthLabels.slice(0, 2)" class="label health-label">{{label}}</span>
+              </div>
+            </div>
+            <div class="recipe-content">
+              <h3>{{recipe.label}}</h3>
+              <div class="recipe-info">
+                <div class="info-item">
+                  <span class="icon">🕒</span>
+                  <span>{{recipe.totalTime || 'N/A'}} min</span>
+                </div>
+                <div class="info-item">
+                  <span class="icon">🔥</span>
+                  <span>{{recipe.calories | number:'1.0-0'}} cal</span>
+                </div>
+                <div class="info-item">
+                  <span class="icon">👥</span>
+                  <span>{{recipe.yield}} porciones</span>
+                </div>
+              </div>
+              <button class="btn btn-outline" (click)="showRecipeDetails(recipe)">Ver receta</button>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="!isLoading && recipes.length === 0 && hasSearched" class="no-results">
+          <p>No se encontraron recetas que coincidan con tu búsqueda. Intenta con otros términos o filtros.</p>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h2>Calculadora Nutricional</h2>
+        <p class="section-description">Ingresa un alimento para conocer su información nutricional</p>
+        
+        <div class="calculator-container">
+          <form [formGroup]="nutritionForm" (ngSubmit)="getNutritionInfo()">
+            <div class="search-input">
+              <input 
+                type="text" 
+                formControlName="ingredient" 
+                placeholder="Ej: 100g de manzana, 1 taza de arroz..."
+              >
+              <button type="submit" class="btn btn-primary">Calcular</button>
+            </div>
+          </form>
+          
+          <div *ngIf="isLoadingNutrition" class="loading">
+            <div class="spinner"></div>
+            <p>Calculando información nutricional...</p>
+          </div>
+          
+          <div *ngIf="nutritionInfo && !isLoadingNutrition" class="nutrition-info">
+            <div class="nutrition-header">
+              <h3>Información Nutricional</h3>
+              <p>{{nutritionForm.value.ingredient}}</p>
+            </div>
+            
+            <div class="nutrition-content">
+              <div class="nutrition-summary">
+                <div class="summary-item">
+                  <span class="value">{{nutritionInfo.calories}}</span>
+                  <span class="label">Calorías</span>
+                </div>
+                <div class="summary-item">
+                  <span class="value">{{nutritionInfo.totalNutrients.PROCNT.quantity | number:'1.0-1'}}{{nutritionInfo.totalNutrients.PROCNT.unit}}</span>
+                  <span class="label">Proteínas</span>
+                </div>
+                <div class="summary-item">
+                  <span class="value">{{nutritionInfo.totalNutrients.FAT.quantity | number:'1.0-1'}}{{nutritionInfo.totalNutrients.FAT.unit}}</span>
+                  <span class="label">Grasas</span>
+                </div>
+                <div class="summary-item">
+                  <span class="value">{{nutritionInfo.totalNutrients.CHOCDF.quantity | number:'1.0-1'}}{{nutritionInfo.totalNutrients.CHOCDF.unit}}</span>
+                  <span class="label">Carbohidratos</span>
+                </div>
+                <div class="summary-item">
+                  <span class="value">{{nutritionInfo.totalNutrients.FIBTG.quantity | number:'1.0-1'}}{{nutritionInfo.totalNutrients.FIBTG.unit}}</span>
+                  <span class="label">Fibra</span>
+                </div>
+              </div>
+              
+              <div class="nutrition-details">
+                <h4>Detalles Nutricionales</h4>
+                <div class="details-grid">
+                  <div *ngFor="let nutrient of nutritionDetails" class="detail-item">
+                    <span class="detail-label">{{nutrient.label}}</span>
+                    <span class="detail-value">{{nutrient.quantity | number:'1.0-1'}} {{nutrient.unit}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section">
+        <h2>Consejos para una Alimentación Saludable</h2>
+        <div class="tips-container">
+          <div class="tip-card">
+            <div class="tip-icon">🥗</div>
+            <h3>Come variado y colorido</h3>
+            <p>Incluye frutas y verduras de diferentes colores en tu dieta para obtener una amplia gama de nutrientes esenciales.</p>
+          </div>
+          
+          <div class="tip-card">
+            <div class="tip-icon">💧</div>
+            <h3>Mantente hidratado</h3>
+            <p>Bebe al menos 8 vasos de agua al día para mantener tu cuerpo funcionando correctamente.</p>
+          </div>
+          
+          <div class="tip-card">
+            <div class="tip-icon">🍽️</div>
+            <h3>Controla las porciones</h3>
+            <p>Presta atención al tamaño de las porciones para evitar comer en exceso, incluso con alimentos saludables.</p>
+          </div>
+          
+          <div class="tip-card">
+            <div class="tip-icon">🥦</div>
+            <h3>Prioriza alimentos integrales</h3>
+            <p>Elige granos enteros, proteínas magras y grasas saludables en lugar de alimentos procesados.</p>
+          </div>
+          
+          <div class="tip-card">
+            <div class="tip-icon">⏰</div>
+            <h3>Come con regularidad</h3>
+            <p>Mantén un horario regular de comidas para estabilizar tus niveles de azúcar en sangre y evitar comer en exceso.</p>
+          </div>
+          
+          <div class="tip-card">
+            <div class="tip-icon">🧂</div>
+            <h3>Reduce sal y azúcar</h3>
+            <p>Limita el consumo de alimentos con alto contenido de sodio y azúcares añadidos para una mejor salud cardiovascular.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal para detalles de receta -->
+  <div *ngIf="selectedRecipe" class="modal" [class.active]="selectedRecipe">
+    <div class="modal-content">
+      <span class="close-button" (click)="closeRecipeDetails()">&times;</span>
+      
+      <div class="recipe-details">
+        <div class="recipe-details-header">
+          <h2>{{selectedRecipe.label}}</h2>
+          <div class="recipe-details-image">
+            <!-- Corregir la imagen añadiendo title además de alt -->
+            <img [src]="selectedRecipe.image" [alt]="selectedRecipe.label || 'Imagen detallada de receta'" title="{{selectedRecipe.label || 'Imagen detallada de receta'}}">
+          </div>
+        </div>
+        
+        <div class="recipe-details-info">
+          <div class="info-section">
+            <h3>Información general</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Tiempo de preparación:</span>
+                <span class="info-value">{{selectedRecipe.totalTime || 'N/A'}} minutos</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Calorías:</span>
+                <span class="info-value">{{selectedRecipe.calories | number:'1.0-0'}} kcal</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Porciones:</span>
+                <span class="info-value">{{selectedRecipe.yield}}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Tipo de cocina:</span>
+                <span class="info-value">{{selectedRecipe.cuisineType?.join(', ') || 'N/A'}}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Tipo de comida:</span>
+                <span class="info-value">{{selectedRecipe.mealType?.join(', ') || 'N/A'}}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Tipo de plato:</span>
+                <span class="info-value">{{selectedRecipe.dishType?.join(', ') || 'N/A'}}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="info-section">
+            <h3>Etiquetas</h3>
+            <div class="tags-container">
+              <span *ngFor="let label of selectedRecipe.dietLabels" class="tag diet-tag">{{label}}</span>
+              <span *ngFor="let label of selectedRecipe.healthLabels" class="tag health-tag">{{label}}</span>
+            </div>
+          </div>
+          
+          <div class="info-section">
+            <h3>Ingredientes</h3>
+            <ul class="ingredients-list">
+              <li *ngFor="let ingredient of selectedRecipe.ingredientLines">{{ingredient}}</li>
+            </ul>
+          </div>
+          
+          <div class="info-section">
+            <h3>Preparación</h3>
+            <p *ngIf="selectedRecipe.url">
+              Para ver las instrucciones completas, visita la 
+              <a [href]="selectedRecipe.url" target="_blank" rel="noopener noreferrer">receta original</a>.
+            </p>
+            <p *ngIf="!selectedRecipe.url">
+              Instrucciones no disponibles para esta receta.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

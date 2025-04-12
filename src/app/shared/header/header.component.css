@@ -1,0 +1,179 @@
+/* src/app/shared/header/header.component.css */
+.header {
+  padding: 1rem 0;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #4CAF50;
+  text-decoration: none;
+}
+
+/* Menú de navegación */
+.main-nav {
+  flex-grow: 1;
+  margin: 0 2rem;
+}
+
+.nav-list {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.nav-item {
+  margin-right: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.nav-item a {
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+  padding: 0.5rem 0;
+}
+
+.nav-item a:hover, 
+.nav-item a.active {
+  color: #4CAF50;
+}
+
+/* Botones de usuario */
+.user-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-outline {
+  border: 1px solid #4CAF50;
+  color: #4CAF50;
+  background-color: transparent;
+}
+
+.btn-outline:hover {
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.btn-primary {
+  background-color: #4CAF50;
+  color: white;
+  border: 1px solid #4CAF50;
+}
+
+.btn-primary:hover {
+  background-color: #45a049;
+}
+
+/* Botón de menú móvil */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.menu-icon {
+  display: block;
+  width: 25px;
+  height: 3px;
+  background-color: #333;
+  position: relative;
+  transition: background-color 0.3s;
+}
+
+.menu-icon::before,
+.menu-icon::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #333;
+  transition: transform 0.3s;
+}
+
+.menu-icon::before {
+  transform: translateY(-8px);
+}
+
+.menu-icon::after {
+  transform: translateY(8px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-content {
+    flex-wrap: wrap;
+  }
+  
+  .menu-toggle {
+    display: block;
+    order: 3;
+  }
+  
+  .main-nav {
+    flex-basis: 100%;
+    order: 4;
+    margin: 1rem 0 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s;
+  }
+  
+  .main-nav.active {
+    max-height: 500px;
+  }
+  
+  .nav-list {
+    flex-direction: column;
+  }
+  
+  .nav-item {
+    margin-right: 0;
+    margin-bottom: 0.75rem;
+  }
+  
+  .user-actions {
+    margin-left: auto;
+    order: 2;
+  }
+}
+
+@media (min-width: 769px) {
+  .main-nav {
+    display: block !important;
+    max-height: none !important;
+  }
+}

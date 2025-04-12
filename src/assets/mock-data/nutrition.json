@@ -1,0 +1,190 @@
+{
+    "calories": 52,
+    "totalWeight": 100,
+    "dietLabels": [
+      "LOW_FAT",
+      "LOW_SODIUM"
+    ],
+    "healthLabels": [
+      "VEGETARIAN",
+      "PESCATARIAN",
+      "MEDITERRANEAN",
+      "DASH",
+      "DAIRY_FREE",
+      "GLUTEN_FREE",
+      "WHEAT_FREE",
+      "EGG_FREE",
+      "MILK_FREE",
+      "PEANUT_FREE",
+      "TREE_NUT_FREE",
+      "SOY_FREE",
+      "FISH_FREE",
+      "SHELLFISH_FREE",
+      "PORK_FREE",
+      "RED_MEAT_FREE",
+      "CRUSTACEAN_FREE",
+      "CELERY_FREE",
+      "MUSTARD_FREE",
+      "SESAME_FREE",
+      "LUPINE_FREE",
+      "MOLLUSK_FREE",
+      "ALCOHOL_FREE",
+      "NO_OIL_ADDED",
+      "NO_SUGAR_ADDED",
+      "SULPHITE_FREE",
+      "KOSHER"
+    ],
+    "cautions": [],
+    "totalNutrients": {
+      "ENERC_KCAL": {
+        "label": "Energía",
+        "quantity": 52,
+        "unit": "kcal"
+      },
+      "FAT": {
+        "label": "Grasa total",
+        "quantity": 0.17,
+        "unit": "g"
+      },
+      "FASAT": {
+        "label": "Grasas saturadas",
+        "quantity": 0.028,
+        "unit": "g"
+      },
+      "FATRN": {
+        "label": "Grasas trans",
+        "quantity": 0,
+        "unit": "g"
+      },
+      "FAMS": {
+        "label": "Grasas monoinsaturadas",
+        "quantity": 0.005,
+        "unit": "g"
+      },
+      "FAPU": {
+        "label": "Grasas poliinsaturadas",
+        "quantity": 0.086,
+        "unit": "g"
+      },
+      "CHOCDF": {
+        "label": "Carbohidratos",
+        "quantity": 13.81,
+        "unit": "g"
+      },
+      "FIBTG": {
+        "label": "Fibra",
+        "quantity": 2.6,
+        "unit": "g"
+      },
+      "SUGAR": {
+        "label": "Azúcares",
+        "quantity": 10.39,
+        "unit": "g"
+      },
+      "PROCNT": {
+        "label": "Proteínas",
+        "quantity": 0.26,
+        "unit": "g"
+      },
+      "CHOLE": {
+        "label": "Colesterol",
+        "quantity": 0,
+        "unit": "mg"
+      },
+      "NA": {
+        "label": "Sodio",
+        "quantity": 1,
+        "unit": "mg"
+      },
+      "CA": {
+        "label": "Calcio",
+        "quantity": 5,
+        "unit": "mg"
+      },
+      "MG": {
+        "label": "Magnesio",
+        "quantity": 27,
+        "unit": "mg"
+      },
+      "K": {
+        "label": "Potasio",
+        "quantity": 358,
+        "unit": "mg"
+      },
+      "FE": {
+        "label": "Hierro",
+        "quantity": 0.26,
+        "unit": "mg"
+      },
+      "ZN": {
+        "label": "Zinc",
+        "quantity": 0.15,
+        "unit": "mg"
+      },
+      "P": {
+        "label": "Fósforo",
+        "quantity": 22,
+        "unit": "mg"
+      },
+      "VITA_RAE": {
+        "label": "Vitamina A",
+        "quantity": 3,
+        "unit": "µg"
+      },
+      "VITC": {
+        "label": "Vitamina C",
+        "quantity": 8.7,
+        "unit": "mg"
+      },
+      "THIA": {
+        "label": "Tiamina (B1)",
+        "quantity": 0.031,
+        "unit": "mg"
+      },
+      "RIBF": {
+        "label": "Riboflavina (B2)",
+        "quantity": 0.073,
+        "unit": "mg"
+      },
+      "NIA": {
+        "label": "Niacina (B3)",
+        "quantity": 0.665,
+        "unit": "mg"
+      },
+      "VITB6A": {
+        "label": "Vitamina B6",
+        "quantity": 0.367,
+        "unit": "mg"
+      },
+      "FOLDFE": {
+        "label": "Folato (equivalente)",
+        "quantity": 20,
+        "unit": "µg"
+      },
+      "VITB12": {
+        "label": "Vitamina B12",
+        "quantity": 0,
+        "unit": "µg"
+      },
+      "VITD": {
+        "label": "Vitamina D",
+        "quantity": 0,
+        "unit": "µg"
+      },
+      "TOCPHA": {
+        "label": "Vitamina E",
+        "quantity": 0.1,
+        "unit": "mg"
+      },
+      "VITK1": {
+        "label": "Vitamina K",
+        "quantity": 0.5,
+        "unit": "µg"
+      },
+      "WATER": {
+        "label": "Agua",
+        "quantity": 74.91,
+        "unit": "g"
+      }
+    }
+  }
