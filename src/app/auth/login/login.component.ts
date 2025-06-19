@@ -30,18 +30,27 @@ export class LoginComponent {
   get email() { return this.loginForm.get('email'); }
   get password() { return this.loginForm.get('password'); }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
       
       // Verificar que email y password no sean undefined
       if (email && password) {
-        const success = this.authService.login(email, password);
+        this.isLoading = true;
+        this.errorMessage = '';
         
-        if (success) {
-          this.router.navigate(['/dashboard']);
-        } else {
-          this.errorMessage = 'Credenciales inválidas. Por favor, intenta de nuevo.';
+        try {
+          const success = await this.authService.login(email, password);
+          
+          if (!success) {
+            this.errorMessage = 'Credenciales inválidas. Por favor, intenta de nuevo.';
+          }
+          // No es necesario redirigir aquí, ya que el servicio lo hace automáticamente
+        } catch (error) {
+          this.errorMessage = 'Error al iniciar sesión. Por favor, intenta de nuevo.';
+          console.error(error);
+        } finally {
+          this.isLoading = false;
         }
       }
     } else {

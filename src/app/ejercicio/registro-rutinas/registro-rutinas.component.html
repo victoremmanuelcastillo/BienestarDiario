@@ -1,0 +1,629 @@
+<!-- src/app/ejercicio/registro-rutinas/registro-rutinas.component.html -->
+<div class="registro-rutinas-container">
+  
+    <!-- Header de navegación -->
+    <div class="header-section">
+      <h2 class="main-title">💪 Mis Rutinas de Ejercicio</h2>
+      
+      <div class="nav-buttons">
+        <button class="nav-btn" 
+                [class.active]="vistaActual === 'lista'"
+                (click)="cambiarVista('lista')">
+          <i class="fas fa-list"></i> Mis Rutinas
+        </button>
+        <button class="nav-btn" 
+                [class.active]="vistaActual === 'crear'"
+                (click)="cambiarVista('crear')">
+          <i class="fas fa-plus"></i> Crear Rutina
+        </button>
+        <button class="nav-btn" 
+                [class.active]="vistaActual === 'historial'"
+                (click)="cambiarVista('historial')">
+          <i class="fas fa-history"></i> Historial
+        </button>
+      </div>
+    </div>
+  
+    <!-- Vista: Lista de Rutinas -->
+    <div *ngIf="vistaActual === 'lista'" class="rutinas-lista">
+      
+      <!-- Filtros -->
+      <div class="filtros-container">
+        <div class="filtro-item">
+          <label for="filtro-categoria" class="sr-only">Filtrar por categoría</label>
+          <select id="filtro-categoria" [(ngModel)]="filtroCategoria" class="filtro-select" aria-label="Filtrar rutinas por categoría">
+            <option value="todas">Todas las categorías</option>
+            <option *ngFor="let cat of categoriasDisponibles" [value]="cat.id">
+              {{ cat.icono }} {{ cat.nombre }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="filtro-item">
+          <label for="filtro-nivel" class="sr-only">Filtrar por nivel</label>
+          <select id="filtro-nivel" [(ngModel)]="filtroNivel" class="filtro-select" aria-label="Filtrar rutinas por nivel de dificultad">
+            <option value="todos">Todos los niveles</option>
+            <option value="principiante">Principiante</option>
+            <option value="intermedio">Intermedio</option>
+            <option value="avanzado">Avanzado</option>
+          </select>
+        </div>
+        
+        <div class="search-container">
+          <input type="text" 
+                 [(ngModel)]="busquedaTexto" 
+                 placeholder="Buscar rutinas..."
+                 class="search-input">
+          <i class="fas fa-search search-icon"></i>
+        </div>
+      </div>
+  
+      <!-- Grid de rutinas -->
+      <div class="rutinas-grid">
+        <div *ngFor="let rutina of rutinas" class="rutina-card">
+          
+          <!-- Header de la tarjeta -->
+          <div class="rutina-header">
+            <div class="rutina-image">
+              <img [src]="rutina.imagen" 
+                   [alt]="'Imagen de la rutina: ' + rutina.nombre"
+                   [title]="rutina.nombre"
+                   onerror="this.src='assets/images/rutinas/default.jpg'">
+              <div class="overlay-badges">
+                <span class="categoria-badge" 
+                      [style.background-color]="obtenerColorCategoria(rutina.categoria)">
+                  {{ obtenerIconoCategoria(rutina.categoria) }} {{ rutina.categoria }}
+                </span>
+                <span class="nivel-badge" [class]="'nivel-' + rutina.nivel">
+                  {{ rutina.nivel }}
+                </span>
+              </div>
+            </div>
+            
+            <button class="fav-btn" 
+                    [class.favorita]="rutina.esFavorita"
+                    (click)="marcarComoFavorita(rutina)"
+                    [attr.aria-label]="'Marcar rutina ' + rutina.nombre + ' como favorita'"
+                    title="Marcar como favorita">
+              <i class="fas fa-heart"></i>
+            </button>
+          </div>
+  
+          <!-- Contenido de la tarjeta -->
+          <div class="rutina-content">
+            <h3>{{ rutina.nombre }}</h3>
+            <p class="descripcion">{{ rutina.descripcion }}</p>
+            
+            <!-- Estadísticas -->
+            <div class="rutina-stats">
+              <div class="stat">
+                <i class="fas fa-clock"></i>
+                <span>{{ rutina.duracionEstimada }}min</span>
+              </div>
+              <div class="stat">
+                <i class="fas fa-dumbbell"></i>
+                <span>{{ rutina.ejercicios.length }} ejercicios</span>
+              </div>
+              <div class="stat">
+                <i class="fas fa-play-circle"></i>
+                <span>{{ rutina.vecesEjecutada }} veces</span>
+              </div>
+            </div>
+            
+            <!-- Etiquetas -->
+            <div class="etiquetas" *ngIf="rutina.etiquetas.length > 0">
+              <span *ngFor="let etiqueta of rutina.etiquetas" class="etiqueta">
+                #{{ etiqueta }}
+              </span>
+            </div>
+            
+            <!-- Última ejecución -->
+            <div class="ultima-ejecucion" *ngIf="rutina.fechaUltimaEjecucion">
+              <small>Última vez: {{ rutina.fechaUltimaEjecucion | date:'dd/MM/yyyy' }}</small>
+            </div>
+            
+            <!-- Acciones -->
+            <div class="rutina-actions">
+              <button class="btn-primary" (click)="iniciarRutina(rutina)">
+                <i class="fas fa-play"></i> Empezar
+              </button>
+              <div class="action-menu">
+                <button class="btn-menu" 
+                        aria-label="Más opciones para la rutina"
+                        title="Más opciones">
+                  <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="menu-dropdown">
+                  <button (click)="duplicarRutina(rutina)">
+                    <i class="fas fa-copy"></i> Duplicar
+                  </button>
+                  <button (click)="rutinaActual = rutina; cambiarVista('editar')">
+                    <i class="fas fa-edit"></i> Editar
+                  </button>
+                  <button class="danger" (click)="eliminarRutina(rutina.id)">
+                    <i class="fas fa-trash"></i> Eliminar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Vista: Crear/Editar Rutina -->
+    <div *ngIf="vistaActual === 'crear'" class="crear-rutina">
+      
+      <!-- Progreso de pasos -->
+      <div class="progress-steps">
+        <div class="step" [class.active]="pasoActual >= 1" [class.completed]="pasoActual > 1">
+          <div class="step-number">1</div>
+          <span>Información Básica</span>
+        </div>
+        <div class="step" [class.active]="pasoActual >= 2" [class.completed]="pasoActual > 2">
+          <div class="step-number">2</div>
+          <span>Agregar Ejercicios</span>
+        </div>
+        <div class="step" [class.active]="pasoActual >= 3">
+          <div class="step-number">3</div>
+          <span>Configurar Detalles</span>
+        </div>
+      </div>
+  
+      <!-- Paso 1: Información Básica -->
+      <div *ngIf="pasoActual === 1" class="paso-container">
+        <h3>📋 Información Básica de la Rutina</h3>
+        
+        <div class="form-group">
+          <label for="nombre">Nombre de la rutina *</label>
+          <input type="text" 
+                 id="nombre"
+                 [(ngModel)]="nuevaRutina.nombre" 
+                 placeholder="Ej: Rutina matutina de fuerza"
+                 class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <textarea id="descripcion"
+                    [(ngModel)]="nuevaRutina.descripcion" 
+                    placeholder="Describe tu rutina..."
+                    class="form-textarea"></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="categoria">Categoría</label>
+            <select id="categoria" [(ngModel)]="nuevaRutina.categoria" class="form-select">
+              <option *ngFor="let cat of categoriasDisponibles" [value]="cat.id">
+                {{ cat.icono }} {{ cat.nombre }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="nivel">Nivel de dificultad</label>
+            <select id="nivel" [(ngModel)]="nuevaRutina.nivel" class="form-select">
+              <option value="principiante">Principiante</option>
+              <option value="intermedio">Intermedio</option>
+              <option value="avanzado">Avanzado</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="nuevaRutina.esPlantilla">
+            <span class="checkmark"></span>
+            Guardar como plantilla
+          </label>
+          
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="nuevaRutina.esFavorita">
+            <span class="checkmark"></span>
+            Marcar como favorita
+          </label>
+        </div>
+      </div>
+  
+      <!-- Paso 2: Agregar Ejercicios -->
+      <div *ngIf="pasoActual === 2" class="paso-container">
+        <h3>💪 Agregar Ejercicios</h3>
+        
+        <!-- Filtros de ejercicios -->
+        <div class="ejercicios-filtros">
+          <select [(ngModel)]="filtroCategoria" (change)="filtrarEjercicios()" class="filtro-select" aria-label="Filtrar ejercicios por categoría">
+            <option value="todas">Todas las categorías</option>
+            <option *ngFor="let cat of categoriasDisponibles" [value]="cat.id">
+              {{ cat.icono }} {{ cat.nombre }}
+            </option>
+          </select>
+          
+          <div class="search-container">
+            <input type="text" 
+                   [(ngModel)]="busquedaTexto" 
+                   (input)="filtrarEjercicios()"
+                   placeholder="Buscar ejercicios..."
+                   class="search-input">
+            <i class="fas fa-search search-icon"></i>
+          </div>
+        </div>
+        
+        <!-- Lista de ejercicios disponibles -->
+        <div class="ejercicios-disponibles">
+          <h4>Ejercicios Disponibles</h4>
+          <div class="ejercicios-grid">
+            <div *ngFor="let ejercicio of ejerciciosFiltrados" class="ejercicio-item">
+              <img [src]="ejercicio.imagen" 
+                   [alt]="'Imagen del ejercicio: ' + ejercicio.nombre"
+                   [title]="ejercicio.nombre"
+                   onerror="this.src='assets/images/ejercicios/default.jpg'">
+              <div class="ejercicio-info">
+                <h5>{{ ejercicio.nombre }}</h5>
+                <div class="musculos">
+                  <span *ngFor="let musculo of ejercicio.musculosObjetivo">{{ musculo }}</span>
+                </div>
+              </div>
+              <button class="btn-add" 
+                      (click)="agregarEjercicioALaRutina(ejercicio)"
+                      [attr.aria-label]="'Agregar ' + ejercicio.nombre + ' a la rutina'"
+                      title="Agregar ejercicio">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Ejercicios seleccionados -->
+        <div class="ejercicios-seleccionados" *ngIf="nuevaRutina.ejercicios && nuevaRutina.ejercicios.length > 0">
+          <h4>Ejercicios en la Rutina ({{ nuevaRutina.ejercicios.length }})</h4>
+          <div class="ejercicios-rutina">
+            <div *ngFor="let ejercicioRutina of nuevaRutina.ejercicios; let i = index" class="ejercicio-rutina-item">
+              <div class="ejercicio-header">
+                <img [src]="ejercicioRutina.ejercicio.imagen" 
+                     [alt]="'Imagen del ejercicio: ' + ejercicioRutina.ejercicio.nombre"
+                     [title]="ejercicioRutina.ejercicio.nombre"
+                     onerror="this.src='assets/images/ejercicios/default.jpg'">
+                <div class="ejercicio-titulo">
+                  <h5>{{ ejercicioRutina.ejercicio.nombre }}</h5>
+                  <span class="orden">Ejercicio {{ i + 1 }}</span>
+                </div>
+                <button class="btn-remove" 
+                        (click)="eliminarEjercicioDeLaRutina(i)"
+                        [attr.aria-label]="'Eliminar ' + ejercicioRutina.ejercicio.nombre + ' de la rutina'"
+                        title="Eliminar ejercicio">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              
+              <div class="ejercicio-config">
+                <div class="config-row">
+                  <div class="config-item">
+                    <label for="series-{{ i }}">Series</label>
+                    <input type="number" 
+                           id="series-{{ i }}"
+                           [(ngModel)]="ejercicioRutina.series" 
+                           min="1" max="10">
+                  </div>
+                  <div class="config-item">
+                    <label for="repeticiones-{{ i }}">Repeticiones</label>
+                    <input type="number" 
+                           id="repeticiones-{{ i }}"
+                           [(ngModel)]="ejercicioRutina.repeticiones" 
+                           min="1" max="100">
+                  </div>
+                  <div class="config-item" *ngIf="ejercicioRutina.ejercicio.categoria === 'fuerza'">
+                    <label for="peso-{{ i }}">Peso (kg)</label>
+                    <input type="number" 
+                           id="peso-{{ i }}"
+                           [(ngModel)]="ejercicioRutina.peso" 
+                           min="0" step="0.5">
+                  </div>
+                  <div class="config-item">
+                    <label for="descanso-{{ i }}">Descanso (seg)</label>
+                    <input type="number" 
+                           id="descanso-{{ i }}"
+                           [(ngModel)]="ejercicioRutina.descanso" 
+                           min="0" max="300" step="15">
+                  </div>
+                </div>
+                
+                <div class="config-notas">
+                  <label for="notas-{{ i }}">Notas (opcional)</label>
+                  <input type="text" 
+                         id="notas-{{ i }}"
+                         [(ngModel)]="ejercicioRutina.notas" 
+                         placeholder="Consejos, modificaciones...">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Paso 3: Configurar Detalles -->
+      <div *ngIf="pasoActual === 3" class="paso-container">
+        <h3>⚙️ Configurar Detalles Finales</h3>
+        
+        <div class="resumen-rutina">
+          <h4>Resumen de la Rutina</h4>
+          
+          <div class="resumen-card">
+            <div class="resumen-header">
+              <h5>{{ nuevaRutina.nombre || 'Mi Nueva Rutina' }}</h5>
+              <span class="duracion-estimada">
+                <i class="fas fa-clock"></i>
+                {{ calcularDuracionEstimada() | number:'1.0-0' }} minutos estimados
+              </span>
+            </div>
+            
+            <div class="resumen-stats">
+              <div class="stat">
+                <span class="stat-number">{{ nuevaRutina.ejercicios?.length || 0 }}</span>
+                <span class="stat-label">Ejercicios</span>
+              </div>
+              <div class="stat">
+                <span class="stat-number">{{ nuevaRutina.categoria }}</span>
+                <span class="stat-label">Categoría</span>
+              </div>
+              <div class="stat">
+                <span class="stat-number">{{ nuevaRutina.nivel }}</span>
+                <span class="stat-label">Nivel</span>
+              </div>
+            </div>
+            
+            <div class="ejercicios-preview">
+              <div *ngFor="let ej of nuevaRutina.ejercicios; let i = index" class="ejercicio-preview">
+                <span class="numero">{{ i + 1 }}.</span>
+                <span class="nombre">{{ ej.ejercicio.nombre }}</span>
+                <span class="config">{{ ej.series }}x{{ ej.repeticiones }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Etiquetas -->
+          <div class="form-group">
+            <label for="etiquetas-input">Etiquetas (opcional)</label>
+            <input type="text" 
+                   id="etiquetas-input"
+                   placeholder="Ej: mañana, fuerza, rápido (separadas por comas)"
+                   class="form-input"
+                   (blur)="actualizarEtiquetas($any($event.target).value)">
+          </div>
+        </div>
+      </div>
+  
+      <!-- Navegación de pasos -->
+      <div class="step-navigation">
+        <button *ngIf="pasoActual > 1" 
+                class="btn-secondary" 
+                (click)="pasoAnterior()">
+          <i class="fas fa-arrow-left"></i> Anterior
+        </button>
+        
+        <div class="spacer"></div>
+        
+        <button *ngIf="pasoActual < totalPasos" 
+                class="btn-primary" 
+                (click)="siguientePaso()"
+                [disabled]="pasoActual === 1 && !nuevaRutina.nombre">
+          Siguiente <i class="fas fa-arrow-right"></i>
+        </button>
+        
+        <button *ngIf="pasoActual === totalPasos" 
+                class="btn-success" 
+                (click)="guardarRutina()"
+                [disabled]="!nuevaRutina.ejercicios || nuevaRutina.ejercicios.length === 0">
+          <i class="fas fa-save"></i> Guardar Rutina
+        </button>
+      </div>
+    </div>
+  
+    <!-- Vista: Ejecutar Rutina -->
+    <div *ngIf="vistaActual === 'ejecutar' && rutinaEnEjecucion" class="ejecutar-rutina">
+      
+      <!-- Header de ejecución -->
+      <div class="ejecucion-header">
+        <button class="btn-back" (click)="limpiarEjecucion(); cambiarVista('lista')">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        
+        <div class="rutina-info">
+          <h3>{{ rutinaEnEjecucion.nombre }}</h3>
+          <div class="progreso-general">
+            <span>{{ ejercicioActualIndex + 1 }} / {{ rutinaEnEjecucion.ejercicios.length }}</span>
+            <div class="progress-bar">
+              <div class="progress-fill" 
+                   [style.width.%]="((ejercicioActualIndex + 1) / rutinaEnEjecucion.ejercicios.length) * 100"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="timer-display">
+          <div class="tiempo-transcurrido">
+            <i class="fas fa-stopwatch"></i>
+            {{ formatearTiempo(tiempoTranscurrido) }}
+          </div>
+        </div>
+      </div>
+  
+      <!-- Ejercicio actual -->
+      <div class="ejercicio-actual" *ngIf="rutinaEnEjecucion.ejercicios[ejercicioActualIndex]">
+        <div class="ejercicio-card-grande">
+          <div class="ejercicio-imagen">
+            <img [src]="rutinaEnEjecucion.ejercicios[ejercicioActualIndex].ejercicio.imagen" 
+                 [alt]="rutinaEnEjecucion.ejercicios[ejercicioActualIndex].ejercicio.nombre"
+                 [title]="rutinaEnEjecucion.ejercicios[ejercicioActualIndex].ejercicio.nombre"
+                 onerror="this.src='assets/images/ejercicios/default.jpg'">
+          </div>
+          
+          <div class="ejercicio-detalles">
+            <h4>{{ rutinaEnEjecucion.ejercicios[ejercicioActualIndex].ejercicio.nombre }}</h4>
+            
+            <div class="configuracion-actual">
+              <div class="config-item">
+                <i class="fas fa-repeat"></i>
+                <span>{{ rutinaEnEjecucion.ejercicios[ejercicioActualIndex].series }} series</span>
+              </div>
+              <div class="config-item">
+                <i class="fas fa-hashtag"></i>
+                <span>{{ rutinaEnEjecucion.ejercicios[ejercicioActualIndex].repeticiones }} repeticiones</span>
+              </div>
+              <div class="config-item" *ngIf="rutinaEnEjecucion.ejercicios[ejercicioActualIndex].peso">
+                <i class="fas fa-weight-hanging"></i>
+                <span>{{ rutinaEnEjecucion.ejercicios[ejercicioActualIndex].peso }} kg</span>
+              </div>
+              <div class="config-item">
+                <i class="fas fa-clock"></i>
+                <span>{{ rutinaEnEjecucion.ejercicios[ejercicioActualIndex].descanso }}s descanso</span>
+              </div>
+            </div>
+            
+            <div class="musculos-trabajados">
+              <strong>Músculos trabajados:</strong>
+              <div class="musculos-list">
+                <span *ngFor="let musculo of rutinaEnEjecucion.ejercicios[ejercicioActualIndex].ejercicio.musculosObjetivo" 
+                      class="musculo-tag">
+                  {{ musculo }}
+                </span>
+              </div>
+            </div>
+            
+            <div class="notas" *ngIf="rutinaEnEjecucion.ejercicios[ejercicioActualIndex].notas">
+              <strong>Notas:</strong>
+              <p>{{ rutinaEnEjecucion.ejercicios[ejercicioActualIndex].notas }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Estado de descanso -->
+      <div *ngIf="enDescanso" class="descanso-overlay">
+        <div class="descanso-card">
+          <h3>💨 Tiempo de Descanso</h3>
+          <div class="countdown-timer">
+            {{ formatearTiempo(tiempoDescanso) }}
+          </div>
+          <p>Prepárate para el siguiente ejercicio</p>
+          <button class="btn-skip" (click)="tiempoDescanso = 0; enDescanso = false">
+            Saltar Descanso
+          </button>
+        </div>
+      </div>
+  
+      <!-- Controles de ejecución -->
+      <div class="controles-ejecucion">
+        <button class="btn-control" 
+                (click)="ejercicioAnterior()"
+                [disabled]="ejercicioActualIndex === 0">
+          <i class="fas fa-step-backward"></i>
+          Anterior
+        </button>
+        
+        <button class="btn-completar" 
+                (click)="completarEjercicio()"
+                [disabled]="enDescanso">
+          <i class="fas fa-check"></i>
+          {{ ejercicioActualIndex === rutinaEnEjecucion.ejercicios.length - 1 ? 'Finalizar' : 'Completar' }}
+        </button>
+        
+        <button class="btn-control" 
+                (click)="siguienteEjercicio()"
+                [disabled]="ejercicioActualIndex === rutinaEnEjecucion.ejercicios.length - 1">
+          <i class="fas fa-step-forward"></i>
+          Siguiente
+        </button>
+      </div>
+  
+      <!-- Lista de ejercicios -->
+      <div class="lista-ejercicios-ejecucion">
+        <h4>Ejercicios de la Rutina</h4>
+        <div class="ejercicios-mini-list">
+          <div *ngFor="let ej of rutinaEnEjecucion.ejercicios; let i = index" 
+               class="ejercicio-mini"
+               [class.actual]="i === ejercicioActualIndex"
+               [class.completado]="ej.completado">
+            <div class="numero">{{ i + 1 }}</div>
+            <div class="info">
+              <span class="nombre">{{ ej.ejercicio.nombre }}</span>
+              <span class="config">{{ ej.series }}x{{ ej.repeticiones }}</span>
+            </div>
+            <div class="estado">
+              <i class="fas fa-check" *ngIf="ej.completado"></i>
+              <i class="fas fa-play" *ngIf="i === ejercicioActualIndex && !ej.completado"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Vista: Historial -->
+    <div *ngIf="vistaActual === 'historial'" class="historial-rutinas">
+      <h3>📊 Historial de Entrenamientos</h3>
+      
+      <div class="historial-stats">
+        <div class="stat-card">
+          <i class="fas fa-calendar-check"></i>
+          <div>
+            <span class="stat-number">{{ historialEjercicios.length }}</span>
+            <span class="stat-label">Entrenamientos</span>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <i class="fas fa-clock"></i>
+          <div>
+            <span class="stat-number">{{ calcularTiempoTotal() }}</span>
+            <span class="stat-label">Minutos totales</span>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <i class="fas fa-fire"></i>
+          <div>
+            <span class="stat-number">{{ calcularCaloriasTotal() }}</span>
+            <span class="stat-label">Calorías quemadas</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="historial-lista">
+        <div *ngFor="let registro of historialEjercicios" class="historial-item">
+          <div class="historial-header">
+            <div class="fecha">
+              <i class="fas fa-calendar"></i>
+              {{ registro.fecha | date:'dd/MM/yyyy HH:mm' }}
+            </div>
+            <div class="estado" [class]="registro.estado">
+              <i class="fas fa-check-circle" *ngIf="registro.estado === 'completada'"></i>
+              <i class="fas fa-exclamation-circle" *ngIf="registro.estado === 'incompleta'"></i>
+              <i class="fas fa-pause-circle" *ngIf="registro.estado === 'pausada'"></i>
+              {{ registro.estado }}
+            </div>
+          </div>
+          
+          <h4>{{ registro.nombreRutina }}</h4>
+          
+          <div class="historial-stats-row">
+            <div class="stat">
+              <i class="fas fa-clock"></i>
+              <span>{{ registro.duracionReal }}min</span>
+            </div>
+            <div class="stat">
+              <i class="fas fa-check-double"></i>
+              <span>{{ registro.ejerciciosCompletados }}/{{ registro.ejerciciosTotal }}</span>
+            </div>
+            <div class="stat">
+              <i class="fas fa-fire"></i>
+              <span>{{ registro.caloriasQuemadas }}cal</span>
+            </div>
+          </div>
+          
+          <div class="notas" *ngIf="registro.notas">
+            <strong>Notas:</strong> {{ registro.notas }}
+          </div>
+        </div>
+      </div>
+    </div>
+  
+  </div>

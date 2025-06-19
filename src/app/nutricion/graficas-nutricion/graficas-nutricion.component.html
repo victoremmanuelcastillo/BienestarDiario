@@ -1,0 +1,185 @@
+<div class="graphs-container">
+    <h3>Resumen de Nutrición</h3>
+    
+    <!-- Filtros -->
+    <div class="graph-filters">
+      <div class="filter-group">
+        <label for="startDate">Fecha inicio:</label>
+        <input 
+          type="date" 
+          id="startDate" 
+          [(ngModel)]="startDate" 
+          class="form-control"
+        >
+      </div>
+      
+      <div class="filter-group">
+        <label for="endDate">Fecha fin:</label>
+        <input 
+          type="date" 
+          id="endDate" 
+          [(ngModel)]="endDate" 
+          class="form-control"
+        >
+      </div>
+      
+      <button class="apply-filters-btn" (click)="applyFilters()">
+        Aplicar filtros
+      </button>
+    </div>
+    
+    <!-- Tarjetas de resumen -->
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="summary-value">{{ summaryData.avgCalories | number:'1.0-0' }}</div>
+        <div class="summary-label">Calorías promedio</div>
+        <div class="trend-indicator" [ngClass]="getTrendClass(summaryData.caloriesTrend)">
+          <span>{{ getTrendIcon(summaryData.caloriesTrend) }}</span>
+          <span>{{ formatPercent(summaryData.caloriesTrend) }}</span>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <div class="summary-value">{{ summaryData.avgProtein | number:'1.0-0' }}g</div>
+        <div class="summary-label">Proteínas promedio</div>
+      </div>
+      
+      <div class="summary-card">
+        <div class="summary-value">{{ summaryData.avgCarbs | number:'1.0-0' }}g</div>
+        <div class="summary-label">Carbohidratos promedio</div>
+      </div>
+      
+      <div class="summary-card">
+        <div class="summary-value">{{ summaryData.avgFat | number:'1.0-0' }}g</div>
+        <div class="summary-label">Grasas promedio</div>
+      </div>
+    </div>
+    
+    <!-- Pestañas de gráficas -->
+    <div class="graph-tabs">
+      <div 
+        class="graph-tab" 
+        [class.active]="activeTab === 'calories'"
+        (click)="setActiveTab('calories')"
+      >
+        Calorías
+      </div>
+      <div 
+        class="graph-tab" 
+        [class.active]="activeTab === 'macros'"
+        (click)="setActiveTab('macros')"
+      >
+        Macronutrientes
+      </div>
+      <div 
+        class="graph-tab" 
+        [class.active]="activeTab === 'imc'"
+        (click)="setActiveTab('imc')"
+      >
+        IMC
+      </div>
+      <div 
+        class="graph-tab" 
+        [class.active]="activeTab === 'recipes'"
+        (click)="setActiveTab('recipes')"
+      >
+        Recetas
+      </div>
+    </div>
+    
+    <!-- Contenido de las gráficas -->
+    <div class="graph-content">
+      <!-- Gráfica de calorías -->
+      <div *ngIf="activeTab === 'calories'">
+        <div *ngIf="nutritionHistory.length > 0" class="chart-container">
+          <canvas id="caloriesChart"></canvas>
+        </div>
+        
+        <div *ngIf="nutritionHistory.length === 0" class="no-data">
+          <i class="fas fa-chart-line"></i>
+          <p>No hay datos de calorías para el período seleccionado</p>
+        </div>
+      </div>
+      
+      <!-- Gráfica de macronutrientes -->
+      <div *ngIf="activeTab === 'macros'">
+        <div *ngIf="nutritionHistory.length > 0" class="chart-container">
+          <canvas id="macrosChart"></canvas>
+        </div>
+        
+        <div *ngIf="nutritionHistory.length === 0" class="no-data">
+          <i class="fas fa-chart-bar"></i>
+          <p>No hay datos de macronutrientes para el período seleccionado</p>
+        </div>
+        
+        <div *ngIf="nutritionHistory.length > 0" class="graph-legend">
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: #3498db;"></div>
+            <span>Proteínas</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: #f39c12;"></div>
+            <span>Carbohidratos</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: #e74c3c;"></div>
+            <span>Grasas</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: #2ecc71;"></div>
+            <span>Fibra</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Gráfica de IMC -->
+      <div *ngIf="activeTab === 'imc'">
+        <div *ngIf="imcHistory.length > 0" class="chart-container">
+          <canvas id="imcChart"></canvas>
+        </div>
+        
+        <div *ngIf="imcHistory.length === 0" class="no-data">
+          <i class="fas fa-weight"></i>
+          <p>No hay datos de IMC para el período seleccionado</p>
+        </div>
+        
+        <div *ngIf="imcHistory.length > 0" class="imc-categories">
+          <div class="imc-category">
+            <div class="category-color" style="background-color: #3498db;"></div>
+            <span>Bajo peso: &lt; 18.5</span>
+          </div>
+          <div class="imc-category">
+            <div class="category-color" style="background-color: #2ecc71;"></div>
+            <span>Normal: 18.5 - 24.9</span>
+          </div>
+          <div class="imc-category">
+            <div class="category-color" style="background-color: #f39c12;"></div>
+            <span>Sobrepeso: 25 - 29.9</span>
+          </div>
+          <div class="imc-category">
+            <div class="category-color" style="background-color: #e74c3c;"></div>
+            <span>Obesidad: ≥ 30</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Gráfica de recetas -->
+      <div *ngIf="activeTab === 'recipes'">
+        <div *ngIf="recipeInteractions.length > 0" class="chart-container">
+          <canvas id="recipesChart"></canvas>
+        </div>
+        
+        <div *ngIf="recipeInteractions.length === 0" class="no-data">
+          <i class="fas fa-utensils"></i>
+          <p>No hay datos de interacción con recetas para el período seleccionado</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Botón para exportar datos -->
+    <!--<div class="export-section">-->
+      <!--<button class="export-btn" (click)="exportData()">-->
+        <!--<i class="fas fa-download"></i> Exportar datos-->
+      <!--</button>-->
+    <!--</div>-->
+  </div>

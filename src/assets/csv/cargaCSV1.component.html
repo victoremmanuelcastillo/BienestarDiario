@@ -1,0 +1,42 @@
+<div class="csv-container">
+  <h3>Carga de archivo CSV</h3>
+  
+  <div class="file-input-container">
+    <label for="csvFileInput">Seleccionar archivo CSV:</label>
+    <input id="csvFileInput" type="file" (change)="onFileSelected($event)" accept=".csv"/>
+  </div>
+
+  <!-- Pantalla de carga -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Cargando datos, por favor espere...</p>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div class="error-container" *ngIf="error">
+    <div class="error-icon">⚠️</div>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Tabla de datos -->
+  <div class="table-container" *ngIf="fileLoaded && columnNames.length > 0">
+    <div class="success-message">
+      <p>✅ Archivo cargado correctamente. Mostrando {{ rows.length }} filas.</p>
+    </div>
+    
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th *ngFor="let col of columnNames">{{ col }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of rows">
+            <td *ngFor="let cell of row">{{ cell }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,565 +1,400 @@
 /* src/app/ejercicio/ejercicio.component.css */
-/* Estilos para la página de ejercicio */
+.ejercicio-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Roboto', sans-serif;
+}
 
-/* Hero Section */
-.hero-section {
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://placehold.co/1200x400');
-    background-size: cover;
-    background-position: center;
-    color: white;
-    padding: 3rem 0;
-    text-align: center;
-    margin-bottom: 2rem;
+.section-title {
+  color: #2e7d32;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  display: block;
+  width: 100px;
+  height: 4px;
+  background: linear-gradient(to right, #2e7d32, #81c784);
+  margin: 0.5rem auto;
+  border-radius: 2px;
+}
+
+.intro-text {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+/* Estilos para la pantalla de carga */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #2e7d32;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Estilos para mensajes de error */
+.error-message {
+  background-color: #ffebee;
+  border-left: 4px solid #f44336;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-cerrar {
+  background-color: transparent;
+  border: none;
+  color: #f44336;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Estilos para la cuadrícula de categorías */
+.categorias-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.categoria-card {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.categoria-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.categoria-img-container {
+  height: 180px;
+  overflow: hidden;
+}
+
+.categoria-img-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.categoria-card:hover .categoria-img-container img {
+  transform: scale(1.05);
+}
+
+.categoria-info {
+  padding: 1.5rem;
+}
+
+.categoria-info h3 {
+  color: #2e7d32;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.4rem;
+}
+
+.categoria-info p {
+  color: #666;
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Estilos para la navegación de migas de pan */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.btn-volver {
+  background-color: transparent;
+  border: none;
+  color: #2e7d32;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+  padding: 0.5rem 0;
+  transition: color 0.3s ease;
+}
+
+.btn-volver:hover {
+  color: #1b5e20;
+}
+
+.btn-volver i {
+  margin-right: 0.5rem;
+}
+
+.breadcrumb h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+/* Estilos para la cuadrícula de ejercicios */
+.ejercicios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.ejercicio-card {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.ejercicio-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.ejercicio-img-container {
+  height: 200px;
+  overflow: hidden;
+}
+
+.ejercicio-img-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.ejercicio-card:hover .ejercicio-img-container img {
+  transform: scale(1.05);
+}
+
+.ejercicio-info {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.ejercicio-info h4 {
+  color: #2e7d32;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+}
+
+.ejercicio-info p {
+  color: #666;
+  margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+.btn-detalles {
+  background-color: #2e7d32;
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+.btn-detalles:hover {
+  background-color: #1b5e20;
+}
+
+/* Estilos para los detalles del ejercicio */
+.ejercicio-detalles {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.detalles-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.detalles-imagen {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.detalles-imagen img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.detalles-info {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.detalles-instrucciones {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.detalles-video {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.info-section {
+  margin-bottom: 1.5rem;
+}
+
+.info-section h4 {
+  color: #2e7d32;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  border-bottom: 2px solid #e8f5e9;
+  padding-bottom: 0.5rem;
+}
+
+.info-section p {
+  margin: 0;
+  color: #555;
+  line-height: 1.6;
+}
+
+.info-section ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #555;
+}
+
+.info-section li {
+  margin-bottom: 0.5rem;
+}
+
+.detalles-instrucciones ol {
+  padding-left: 1.5rem;
+  color: #555;
+}
+
+.detalles-instrucciones li {
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.video-container {
+  position: relative;
+  padding-bottom: 56.25%; /* Proporción 16:9 */
+  height: 0;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+/* Mensaje cuando no hay ejercicios */
+.no-ejercicios {
+  text-align: center;
+  padding: 3rem;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  color: #757575;
+}
+
+/* Estilos responsivos */
+@media (max-width: 992px) {
+  .detalles-grid {
+    grid-template-columns: 1fr;
   }
   
-  .hero-section h1 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+  .detalles-imagen,
+  .detalles-info,
+  .detalles-instrucciones,
+  .detalles-video {
+    grid-column: 1;
   }
   
-  .hero-section p {
-    font-size: 1.2rem;
-    max-width: 800px;
-    margin: 0 auto;
+  .detalles-imagen {
+    grid-row: 1;
   }
   
-  /* Secciones */
-  .section {
-    margin-bottom: 3rem;
-    padding: 2rem;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  .detalles-info {
+    grid-row: 2;
   }
   
-  .section h2 {
-    color: #333;
-    margin-bottom: 1.5rem;
-    position: relative;
-    padding-bottom: 0.5rem;
+  .detalles-instrucciones {
+    grid-row: 3;
   }
   
-  .section h2::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 50px;
-    height: 3px;
-    background-color: #4CAF50;
+  .detalles-video {
+    grid-row: 4;
+  }
+}
+
+@media (max-width: 768px) {
+  .ejercicio-container {
+    padding: 1rem;
   }
   
-  .section-description {
-    color: #666;
-    margin-bottom: 1.5rem;
+  .categorias-grid,
+  .ejercicios-grid {
+    grid-template-columns: 1fr;
   }
   
-  /* Tabs */
-  .tabs-container {
-    margin-bottom: 2rem;
-  }
-  
-  .tabs {
-    display: flex;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .tab-button {
-    padding: 1rem 2rem;
-    background: none;
-    border: none;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #666;
-    cursor: pointer;
-    transition: all 0.3s;
-    position: relative;
-  }
-  
-  .tab-button:hover {
-    color: #4CAF50;
-  }
-  
-  .tab-button.active {
-    color: #4CAF50;
-  }
-  
-  .tab-button.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background-color: #4CAF50;
-  }
-  
-  /* Categorías */
-  .categories-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-  
-  .category-card {
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    padding: 1.5rem 1rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    border: 2px solid transparent;
-  }
-  
-  .category-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-    border-color: #e0e0e0;
-  }
-  
-  .category-card.active {
-    background-color: #e8f5e9;
-    border-color: #4CAF50;
-  }
-  
-  .category-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  .category-card h3 {
-    margin: 0;
-    font-size: 1rem;
-    color: #333;
-  }
-  
-  /* Loading */
-  .loading {
-    display: flex;
+  .breadcrumb {
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
+    align-items: flex-start;
   }
   
-  .spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    border-top-color: #4CAF50;
-    animation: spin 1s linear infinite;
-    margin-bottom: 1rem;
+  .breadcrumb h3 {
+    margin-top: 0.5rem;
   }
-  
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-  
-  /* Ejercicios */
-  .exercises-container {
-    margin-top: 2rem;
-  }
-  
-  .exercises-container h3 {
-    margin-bottom: 1.5rem;
-    color: #333;
-  }
-  
-  .exercises-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-  }
-  
-  .exercise-card {
-    background-color: white;
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s;
-    cursor: pointer;
-  }
-  
-  .exercise-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  }
-  
-  .exercise-card h4 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    color: #333;
-  }
-  
-  .exercise-description {
-    color: #666;
-    margin-bottom: 1.5rem;
-    height: 4.5em;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-    -webkit-box-orient: vertical;
-  }
-  
-  .btn-outline {
-    display: block;
-    width: 100%;
-    padding: 0.75rem;
-    background-color: transparent;
-    border: 2px solid #4CAF50;
-    color: #4CAF50;
-    border-radius: 4px;
-    font-weight: 600;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-  
-  .btn-outline:hover {
-    background-color: #4CAF50;
-    color: white;
-  }
-  
-  /* Rutinas */
-  .routines-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 2rem;
-  }
-  
-  .routine-card {
-    background-color: white;
-    border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s;
-  }
-  
-  .routine-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  }
-  
-  .routine-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-  
-  .routine-header h3 {
-    margin: 0;
-    color: #333;
-  }
-  
-  .routine-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-  
-  .routine-badge.principiante {
-    background-color: #e8f5e9;
-    color: #2e7d32;
-  }
-  
-  .routine-badge.intermedio {
-    background-color: #e3f2fd;
-    color: #1565c0;
-  }
-  
-  .routine-badge.avanzado {
-    background-color: #fce4ec;
-    color: #c2185b;
-  }
-  
-  .routine-description {
-    color: #666;
-    margin-bottom: 1.5rem;
-  }
-  
-  .routine-info {
-    display: flex;
-    margin-bottom: 1.5rem;
-    gap: 2rem;
-  }
-  
-  .info-item {
-    display: flex;
-    align-items: center;
-    color: #555;
-  }
-  
-  .info-item .icon {
-    margin-right: 0.5rem;
-    font-size: 1.2rem;
-  }
-  
-  .routine-exercises {
-    margin-bottom: 1.5rem;
-  }
-  
-  .routine-exercises h4 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    color: #333;
-  }
-  
-  .exercise-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .exercise-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .exercise-name {
-    font-weight: 500;
-    color: #333;
-  }
-  
-  .exercise-details {
-    color: #666;
-  }
-  
-  .btn-primary {
-    display: block;
-    width: 100%;
-    padding: 0.75rem;
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    border-radius: 4px;
-    font-weight: 600;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .btn-primary:hover {
-    background-color: #45a049;
-  }
-  
-  /* Consejos */
-  .tips-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
-  }
-  
-  .tip-card {
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    padding: 1.5rem;
-    text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-  
-  .tip-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-  }
-  
-  .tip-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  .tip-card h3 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    color: #333;
-  }
-  
-  .tip-card p {
-    color: #666;
-    margin: 0;
-  }
-  
-  /* Modal */
-  .modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    overflow-y: auto;
-    padding: 2rem 0;
-  }
-  
-  .modal.active {
-    display: block;
-  }
-  
-  .modal-content {
-    background-color: white;
-    margin: 0 auto;
-    max-width: 800px;
-    border-radius: 10px;
-    position: relative;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-  }
-  
-  .close-button {
-    position: absolute;
-    top: 1rem;
-    right: 1.5rem;
-    font-size: 2rem;
-    color: #333;
-    cursor: pointer;
-    z-index: 10;
-  }
-  
-  .exercise-details {
-    padding: 2rem;
-  }
-  
-  .exercise-details-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-  }
-  
-  .exercise-details-header h2 {
-    margin: 0;
-    color: #333;
-  }
-  
-  .category-badge {
-    padding: 0.5rem 1rem;
-    background-color: #e8f5e9;
-    color: #2e7d32;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 600;
-  }
-  
-  .exercise-details-content {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-  
-  .exercise-images {
-    display: flex;
-    gap: 1rem;
-    overflow-x: auto;
-    padding-bottom: 1rem;
-  }
-  
-  .exercise-image {
-    flex: 0 0 auto;
-    width: 200px;
-    height: 200px;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  
-  .exercise-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .exercise-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-  
-  .info-section {
-    margin-bottom: 1rem;
-  }
-  
-  .info-section h3 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    color: #333;
-    font-size: 1.3rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .description {
-    color: #333;
-    line-height: 1.6;
-  }
-  
-  .tags-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  
-  .tag {
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-  }
-  
-  .muscle-tag {
-    background-color: #e3f2fd;
-    color: #1565c0;
-  }
-  
-  .equipment-tag {
-    background-color: #fff3e0;
-    color: #e65100;
-  }
-  
-  /* No results */
-  .no-results {
-    text-align: center;
-    padding: 2rem;
-    color: #666;
-  }
-  
-  /* Responsive */
-  @media (max-width: 768px) {
-    .hero-section h1 {
-      font-size: 2rem;
-    }
-    
-    .hero-section p {
-      font-size: 1rem;
-    }
-    
-    .categories-container {
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    }
-    
-    .routines-container {
-      grid-template-columns: 1fr;
-    }
-    
-    .exercise-details-content {
-      flex-direction: column;
-    }
-    
-    .exercise-images {
-      width: 100%;
-    }
-    
-    .modal-content {
-      margin: 0 1rem;
-    }
-    
-    .exercise-details {
-      padding: 1.5rem;
-    }
-  }
+}

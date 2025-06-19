@@ -1,208 +1,135 @@
-<!-- src/app/ejercicio/ejercicio.component.html -->
 <div class="ejercicio-container">
-    <div class="hero-section">
-      <div class="container">
-        <h1>Ejercicio y Actividad Física</h1>
-        <p>Descubre ejercicios, rutinas y consejos para mantenerte activo y saludable</p>
-      </div>
-    </div>
+  <h2 class="section-title">Ejercicios</h2>
   
-    <div class="container">
-      <div class="tabs-container">
-        <div class="tabs">
-          <button 
-            class="tab-button" 
-            [class.active]="activeTab === 'exercises'"
-            (click)="setActiveTab('exercises')"
-          >
-            Ejercicios
-          </button>
-          <button 
-            class="tab-button" 
-            [class.active]="activeTab === 'routines'"
-            (click)="setActiveTab('routines')"
-          >
-            Rutinas
-          </button>
+  <div *ngIf="error" class="error-message">
+    <p>{{ error }}</p>
+    <button (click)="error = null" class="btn-cerrar">Cerrar</button>
+  </div>
+
+  <!-- Pantalla de carga -->
+  <div *ngIf="cargando" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando...</p>
+  </div>
+
+  <!-- Lista de categorías -->
+  <div *ngIf="!categoriaSeleccionada && !cargando" class="categorias-container">
+    <p class="intro-text">Selecciona una categoría para ver los ejercicios disponibles:</p>
+    
+    <div class="categorias-grid">
+      <div *ngFor="let categoria of categorias" class="categoria-card" (click)="seleccionarCategoria(categoria)">
+        <div class="categoria-img-container">
+          <img 
+            src="{{ categoria.imagen || 'assets/images/ejercicios/default.jpg' }}" 
+            alt="Imagen de ejercicios para {{ categoria.nombre }}" 
+            title="Ejercicios para {{ categoria.nombre }}"
+            onerror="this.onerror=null; this.src='assets/images/ejercicios/default.jpg';">
         </div>
-      </div>
-  
-      <!-- Sección de ejercicios -->
-      <div class="tab-content" *ngIf="activeTab === 'exercises'">
-        <div class="section">
-          <h2>Biblioteca de Ejercicios</h2>
-          <p class="section-description">Explora ejercicios por categoría muscular</p>
-          
-          <div class="categories-container">
-            <div 
-              *ngFor="let category of categories" 
-              class="category-card" 
-              [class.active]="selectedCategory === category.id"
-              (click)="loadExercisesByCategory(category.id)"
-            >
-              <div class="category-icon">
-                <span *ngIf="category.name === 'Brazos'">💪</span>
-                <span *ngIf="category.name === 'Piernas'">🦵</span>
-                <span *ngIf="category.name === 'Abdominales'">🧘</span>
-                <span *ngIf="category.name === 'Pecho'">👕</span>
-                <span *ngIf="category.name === 'Espalda'">🔙</span>
-                <span *ngIf="category.name === 'Hombros'">🏋️</span>
-                <span *ngIf="category.name === 'Cardio'">❤️</span>
-                <span *ngIf="!['Brazos', 'Piernas', 'Abdominales', 'Pecho', 'Espalda', 'Hombros', 'Cardio'].includes(category.name)">🏃</span>
-              </div>
-              <h3>{{category.name}}</h3>
-            </div>
-          </div>
-          
-          <div *ngIf="isLoading" class="loading">
-            <div class="spinner"></div>
-            <p>Cargando...</p>
-          </div>
-          
-          <div *ngIf="selectedCategory && exercises.length > 0 && !isLoading" class="exercises-container">
-            <h3>Ejercicios disponibles</h3>
-            <div class="exercises-grid">
-              <div *ngFor="let exercise of exercises" class="exercise-card" (click)="showExerciseDetails(exercise)">
-                <h4>{{exercise.name}}</h4>
-                <p *ngIf="exercise.description" class="exercise-description">{{exercise.description | slice:0:100}}...</p>
-                <p *ngIf="!exercise.description" class="exercise-description">Haz clic para ver detalles del ejercicio.</p>
-                <button class="btn-outline">Ver detalles</button>
-              </div>
-            </div>
-          </div>
-          
-          <div *ngIf="selectedCategory && exercises.length === 0 && !isLoading" class="no-results">
-            <p>No se encontraron ejercicios para esta categoría.</p>
-          </div>
-        </div>
-      </div>
-  
-      <!-- Sección de rutinas -->
-      <div class="tab-content" *ngIf="activeTab === 'routines'">
-        <div class="section">
-          <h2>Rutinas de Entrenamiento</h2>
-          <p class="section-description">Rutinas prediseñadas para diferentes niveles y objetivos</p>
-          
-          <div class="routines-container">
-            <div *ngFor="let routine of workoutRoutines" class="routine-card">
-              <div class="routine-header">
-                <h3>{{routine.name}}</h3>
-                <span class="routine-badge" [class]="routine.difficulty.toLowerCase()">{{routine.difficulty}}</span>
-              </div>
-              
-              <p class="routine-description">{{routine.description}}</p>
-              
-              <div class="routine-info">
-                <div class="info-item">
-                  <span class="icon">⏱️</span>
-                  <span>{{routine.duration}}</span>
-                </div>
-                <div class="info-item">
-                  <span class="icon">🏋️</span>
-                  <span>{{routine.exercises.length}} ejercicios</span>
-                </div>
-              </div>
-              
-              <div class="routine-exercises">
-                <h4>Ejercicios</h4>
-                <ul class="exercise-list">
-                  <li *ngFor="let exercise of routine.exercises">
-                    <div class="exercise-item">
-                      <span class="exercise-name">{{exercise.name}}</span>
-                      <span class="exercise-details">{{exercise.sets}} series × {{exercise.reps}}</span>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-              
-              <button class="btn-primary">Comenzar rutina</button>
-            </div>
-          </div>
-        </div>
-      </div>
-  
-      <div class="section">
-        <h2>Consejos para una Actividad Física Efectiva</h2>
-        <div class="tips-container">
-          <div class="tip-card">
-            <div class="tip-icon">🏃</div>
-            <h3>Consistencia es clave</h3>
-            <p>Es mejor hacer ejercicio moderado regularmente que sesiones intensas ocasionales.</p>
-          </div>
-          
-          <div class="tip-card">
-            <div class="tip-icon">🥤</div>
-            <h3>Mantente hidratado</h3>
-            <p>Bebe agua antes, durante y después del ejercicio para mantener un rendimiento óptimo.</p>
-          </div>
-          
-          <div class="tip-card">
-            <div class="tip-icon">🔄</div>
-            <h3>Varía tu rutina</h3>
-            <p>Cambia tus ejercicios regularmente para evitar el estancamiento y mantener la motivación.</p>
-          </div>
-          
-          <div class="tip-card">
-            <div class="tip-icon">😴</div>
-            <h3>Descansa adecuadamente</h3>
-            <p>El descanso es esencial para la recuperación muscular y prevenir lesiones.</p>
-          </div>
-          
-          <div class="tip-card">
-            <div class="tip-icon">🍎</div>
-            <h3>Nutrición adecuada</h3>
-            <p>Combina el ejercicio con una alimentación balanceada para obtener mejores resultados.</p>
-          </div>
-          
-          <div class="tip-card">
-            <div class="tip-icon">📊</div>
-            <h3>Establece metas realistas</h3>
-            <p>Define objetivos alcanzables y mide tu progreso para mantener la motivación.</p>
-          </div>
+        <div class="categoria-info">
+          <h3>{{ categoria.nombre }}</h3>
+          <p>{{ categoria.descripcion }}</p>
         </div>
       </div>
     </div>
   </div>
-  
-  <!-- Modal para detalles de ejercicio -->
-  <div *ngIf="selectedExercise && exerciseDetails" class="modal" [class.active]="selectedExercise">
-    <div class="modal-content">
-      <span class="close-button" (click)="closeExerciseDetails()">&times;</span>
+
+  <!-- Lista de ejercicios por categoría -->
+  <div *ngIf="categoriaSeleccionada && !ejercicioSeleccionado && !cargando" class="ejercicios-container">
+    <div class="breadcrumb">
+      <button (click)="volverACategorias()" class="btn-volver">
+        <i class="fas fa-arrow-left"></i> Volver a categorías
+      </button>
+      <h3>Ejercicios de {{ categoriaSeleccionada }}</h3>
+    </div>
+    
+    <div *ngIf="categoriaSeleccionada && ejerciciosPorCategoria[categoriaSeleccionada]?.length === 0" class="no-ejercicios">
+      <p>No hay ejercicios disponibles para esta categoría.</p>
+    </div>
+    
+    <div *ngIf="categoriaSeleccionada && ejerciciosPorCategoria[categoriaSeleccionada] && ejerciciosPorCategoria[categoriaSeleccionada].length > 0" 
+         class="ejercicios-grid" 
+         role="region" 
+         aria-label="Lista de ejercicios disponibles">
+      <div *ngFor="let ejercicio of ejerciciosPorCategoria[categoriaSeleccionada]" 
+           class="ejercicio-card" 
+           (click)="verDetallesEjercicio(ejercicio)">
+        <div class="ejercicio-img-container">
+          <img 
+            src="{{ ejercicio.imagen || 'assets/images/ejercicios/default.jpg' }}" 
+            alt="Imagen del ejercicio {{ ejercicio.nombre }}" 
+            title="{{ ejercicio.nombre }}"
+            onerror="this.onerror=null; this.src='assets/images/ejercicios/default.jpg';">
+        </div>
+        <div class="ejercicio-info">
+          <h4>{{ ejercicio.nombre }}</h4>
+          <p>{{ ejercicio.descripcion }}</p>
+          <button class="btn-detalles">Ver detalles</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detalles del ejercicio -->
+  <div *ngIf="ejercicioSeleccionado && !cargando" class="ejercicio-detalles">
+    <div class="breadcrumb">
+      <button (click)="volverACategoria()" class="btn-volver">
+        <i class="fas fa-arrow-left"></i> Volver a ejercicios
+      </button>
+      <h3>{{ getNombre(ejercicioSeleccionado) }}</h3>
+    </div>
+    
+    <div class="detalles-grid">
+      <div class="detalles-imagen">
+        <img 
+          src="{{ ejercicioSeleccionado.imagen || 'assets/images/ejercicios/default.jpg' }}" 
+          alt="Imagen detallada del ejercicio {{ getNombre(ejercicioSeleccionado) }}" 
+          title="{{ getNombre(ejercicioSeleccionado) }}"
+          onerror="this.onerror=null; this.src='assets/images/ejercicios/default.jpg';">
+      </div>
       
-      <div class="exercise-details">
-        <div class="exercise-details-header">
-          <h2>{{exerciseDetails.name}}</h2>
-          <span *ngIf="exerciseDetails.category" class="category-badge">{{exerciseDetails.category.name}}</span>
+      <div class="detalles-info">
+        <div class="info-section">
+          <h4>Descripción</h4>
+          <p>{{ getDescripcion(ejercicioSeleccionado) }}</p>
         </div>
         
-        <div class="exercise-details-content">
-          <div class="exercise-images" *ngIf="exerciseImages.length > 0">
-            <div *ngFor="let image of exerciseImages" class="exercise-image">
-                <img [src]="image.image" [alt]="exerciseDetails.name" title="{{exerciseDetails.name}}">
-            </div>
-          </div>
-          
-          <div class="exercise-info">
-            <div class="info-section">
-              <h3>Descripción</h3>
-              <div class="description" [innerHTML]="exerciseDetails.description"></div>
-            </div>
-            
-            <div class="info-section" *ngIf="exerciseDetails.muscles && exerciseDetails.muscles.length > 0">
-              <h3>Músculos trabajados</h3>
-              <div class="tags-container">
-                <span *ngFor="let muscle of exerciseDetails.muscles" class="tag muscle-tag">{{muscle.name}}</span>
-              </div>
-            </div>
-            
-            <div class="info-section" *ngIf="exerciseDetails.equipment && exerciseDetails.equipment.length > 0">
-              <h3>Equipamiento necesario</h3>
-              <div class="tags-container">
-                <span *ngFor="let equipment of exerciseDetails.equipment" class="tag equipment-tag">{{equipment.name}}</span>
-              </div>
-            </div>
-          </div>
+        <div class="info-section">
+          <h4>Músculos trabajados</h4>
+          <ul>
+            <li *ngFor="let musculo of getMusculos(ejercicioSeleccionado)">{{ musculo }}</li>
+          </ul>
+        </div>
+        
+        <div class="info-section">
+          <h4>Dificultad</h4>
+          <p>{{ getDificultad(ejercicioSeleccionado) }}</p>
+        </div>
+        
+        <div class="info-section">
+          <h4>Equipamiento necesario</h4>
+          <p>{{ getEquipamiento(ejercicioSeleccionado) }}</p>
+        </div>
+      </div>
+      
+      <div class="detalles-instrucciones">
+        <h4>Instrucciones</h4>
+        <ol>
+          <li *ngFor="let paso of getInstrucciones(ejercicioSeleccionado)">{{ paso }}</li>
+        </ol>
+      </div>
+      
+      <div class="detalles-video">
+        <h4>Video demostrativo</h4>
+        <div class="video-container">
+          <iframe 
+            [src]="getSafeVideoUrl(ejercicioSeleccionado.video)" 
+            title="Video demostrativo del ejercicio {{ getNombre(ejercicioSeleccionado) }}"
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+          </iframe>
         </div>
       </div>
     </div>
   </div>
+</div>

@@ -1,0 +1,37 @@
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { HomeComponent } from './home/home.component';
+import { NutricionComponent } from './nutricion/nutricion.component';
+import { EjercicioComponent } from './ejercicio/ejercicio.component';
+import { SuenoComponent } from './sueno/sueno.component';
+import { MeditacionComponent } from './meditacion/meditacion.component';
+import { BlogComponent } from './blog/blog.component';
+import { LoginComponent } from './auth/login/login.component'; // Corregido
+import { ProfileComponent } from './auth/profile/profile.component'; // Corregido
+import { AuthGuard } from './guards/auth.guard';
+import { ImcCalculatorComponent } from './imc-calculator/imc-calculator.component';
+import { CargaCSVComponent } from './../assets/csv/cargaCSV1.component';
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+
+const routes: Routes = [
+  
+  { path: 'nutricion', component: NutricionComponent },
+  { path: 'ejercicio', component: EjercicioComponent },
+  { path: 'sueno', component: SuenoComponent },
+  { path: 'meditacion', component: MeditacionComponent },
+  { path: 'blog', component: BlogComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
+  { path: 'calculadora-imc', component: ImcCalculatorComponent },
+  { path: 'cargaCSV1component', component: CargaCSVComponent },
+  { path: '', component: HomeComponent },
+  
+  { path: '**', redirectTo: '' }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }

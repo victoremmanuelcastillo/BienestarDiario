@@ -1,0 +1,43 @@
+<div class="intro-modal-overlay">
+    <div class="intro-modal">
+      <h2>¡Bienvenido a BienestarDiario!</h2>
+      
+      <div class="intro-content">
+        <h3>La importancia de los hábitos saludables</h3>
+        <p>Los hábitos saludables son fundamentales para mantener un buen estado de salud física y mental. Incorporar rutinas positivas en tu día a día puede tener un impacto significativo en tu calidad de vida.</p>
+        
+        <div class="intro-benefits">
+          <div class="benefit-item">
+            <div class="benefit-icon">🥗</div>
+            <h4>Nutrición balanceada</h4>
+            <p>Una alimentación equilibrada proporciona los nutrientes necesarios para el funcionamiento óptimo del cuerpo.</p>
+          </div>
+          
+          <div class="benefit-item">
+            <div class="benefit-icon">🏃‍♂️</div>
+            <h4>Ejercicio regular</h4>
+            <p>La actividad física fortalece el sistema cardiovascular, mejora el estado de ánimo y aumenta la energía.</p>
+          </div>
+          
+          <div class="benefit-item">
+            <div class="benefit-icon">😴</div>
+            <h4>Descanso adecuado</h4>
+            <p>Un buen descanso es esencial para la recuperación física y mental, mejorando la concentración y productividad.</p>
+          </div>
+          
+          <div class="benefit-item">
+            <div class="benefit-icon">🧘‍♀️</div>
+            <h4>Meditación</h4>
+            <p>Practicar mindfulness reduce el estrés y la ansiedad, mejorando tu bienestar emocional.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="intro-actions">
+        <button class="btn btn-primary" (click)="closeModal(false)">Comenzar mi viaje</button>
+        <label class="dont-show-again">
+          <input type="checkbox" (change)="toggleDontShowAgain($event)"> No mostrar de nuevo
+        </label>
+      </div>
+    </div>
+  </div>

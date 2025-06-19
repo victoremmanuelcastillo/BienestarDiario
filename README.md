@@ -1,3 +1,7 @@
+=======
+BienestarDiario es un prototipo completo desarrollado en Angular que ayuda a los usuarios a adoptar un estilo de vida saludable mediante seguimiento de hábitos, consejos personalizados y conexión con APIs gratuitas de nutrición y bienestar.  ✨ Objetivo: Crear una experiencia intuitiva y motivadora para que los usuarios mejoren su salud
+>>>>>>> 24870bc5e180992b2cf57ab5243c700f56c607f0
+
 # BienestarDiario
 HEAD
 
@@ -58,6 +62,3 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
-=======
-BienestarDiario es un prototipo completo desarrollado en Angular que ayuda a los usuarios a adoptar un estilo de vida saludable mediante seguimiento de hábitos, consejos personalizados y conexión con APIs gratuitas de nutrición y bienestar.  ✨ Objetivo: Crear una experiencia intuitiva y motivadora para que los usuarios mejoren su salud
->>>>>>> 24870bc5e180992b2cf57ab5243c700f56c607f0

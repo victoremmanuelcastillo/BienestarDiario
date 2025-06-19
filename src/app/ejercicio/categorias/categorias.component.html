@@ -1,0 +1,386 @@
+<!-- src/app/ejercicio/categorias/categorias.component.html -->
+<div class="categorias-container">
+  
+    <!-- Vista: Lista de Categorías -->
+    <div *ngIf="vistaActual === 'categorias'" class="categorias-lista">
+      
+      <!-- Header -->
+      <div class="header-section">
+        <h2 class="main-title">🎯 Categorías de Ejercicio</h2>
+        <p class="subtitle">Explora diferentes tipos de entrenamiento para alcanzar tus objetivos</p>
+      </div>
+  
+      <!-- Filtros y Búsqueda -->
+      <div class="filtros-section">
+        <div class="filtros-container">
+          <div class="search-container">
+            <input type="text" 
+                   [(ngModel)]="busquedaTexto" 
+                   (input)="onBusquedaChange()"
+                   placeholder="Buscar categorías, beneficios..."
+                   class="search-input">
+            <i class="fas fa-search search-icon"></i>
+          </div>
+          
+          <div class="filtro-grupo">
+            <label for="filtro-nivel">Nivel:</label>
+            <select id="filtro-nivel" [(ngModel)]="filtroNivel" (change)="onFiltroNivelChange()" class="filtro-select" aria-label="Filtrar por nivel de dificultad">
+              <option value="todos">Todos los niveles</option>
+              <option value="principiante">Principiante</option>
+              <option value="intermedio">Intermedio</option>
+              <option value="avanzado">Avanzado</option>
+            </select>
+          </div>
+          
+          <div class="filtro-grupo">
+            <label for="ordenar-por">Ordenar por:</label>
+            <select id="ordenar-por" [(ngModel)]="ordenPor" (change)="onOrdenChange()" class="filtro-select" aria-label="Ordenar categorías por criterio">
+              <option value="popularidad">Popularidad</option>
+              <option value="nombre">Nombre</option>
+              <option value="ejercicios">Nº Ejercicios</option>
+            </select>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Loading State -->
+      <div *ngIf="cargandoCategorias" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Cargando categorías...</p>
+      </div>
+  
+      <!-- Grid de Categorías -->
+      <div *ngIf="!cargandoCategorias" class="categorias-grid">
+        <div *ngFor="let categoria of categoriasFiltradas; let i = index" 
+             class="categoria-card" 
+             (click)="verDetalleCategoria(categoria)"
+             [style.animation-delay.s]="i * 0.1">
+          
+          <!-- Header de la tarjeta -->
+          <div class="categoria-header">
+            <div class="categoria-imagen">
+              <img [src]="categoria.imagen" [alt]="categoria.nombre"
+                   onerror="this.src='assets/images/categorias/default.png'">
+              <div class="overlay">
+                <span class="icono-categoria">{{ categoria.icono }}</span>
+                <div class="popularidad-badge">
+                  <i class="fas fa-fire"></i>
+                  {{ categoria.popularidad }}%
+                </div>
+              </div>
+            </div>
+            
+            <button class="fav-btn" 
+                    (click)="marcarComoFavorito(categoria); $event.stopPropagation()"
+                    [attr.aria-label]="'Marcar ' + categoria.nombre + ' como favorita'"
+                    title="Marcar como favorita">
+              <i class="far fa-heart"></i>
+            </button>
+          </div>
+  
+          <!-- Contenido de la tarjeta -->
+          <div class="categoria-content">
+            <div class="categoria-info">
+              <h3 [style.color]="categoria.color">{{ categoria.nombre }}</h3>
+              <p class="descripcion">{{ categoria.descripcion }}</p>
+              
+              <!-- Stats principales -->
+              <div class="stats-principales">
+                <div class="stat-item">
+                  <i class="fas fa-dumbbell" [style.color]="categoria.color"></i>
+                  <span>{{ categoria.ejerciciosCount }} ejercicios</span>
+                </div>
+                <div class="stat-item">
+                  <i class="fas fa-clock" [style.color]="categoria.color"></i>
+                  <span>{{ categoria.tiempoPromedio }}min promedio</span>
+                </div>
+                <div class="stat-item">
+                  <i class="fas fa-fire" [style.color]="categoria.color"></i>
+                  <span>{{ categoria.caloriasPromedio }}cal promedio</span>
+                </div>
+              </div>
+              
+              <!-- Nivel recomendado -->
+              <div class="nivel-recomendado">
+                <span class="nivel-badge" [class]="'nivel-' + categoria.nivel">
+                  {{ categoria.nivel === 'todos' ? 'Todos los niveles' : categoria.nivel }}
+                </span>
+              </div>
+              
+              <!-- Tags -->
+              <div class="categoria-tags">
+                <span *ngFor="let tag of categoria.tags" class="tag" [style.background-color]="categoria.color + '20'" [style.color]="categoria.color">
+                  #{{ tag }}
+                </span>
+              </div>
+              
+              <!-- Beneficios principales (primeros 3) -->
+              <div class="beneficios-preview">
+                <h5>Beneficios principales:</h5>
+                <ul>
+                  <li *ngFor="let beneficio of categoria.beneficios.slice(0, 3)">{{ beneficio }}</li>
+                </ul>
+              </div>
+            </div>
+            
+            <!-- Acciones -->
+            <div class="categoria-actions">
+              <button class="btn-primary" [style.background]="categoria.color">
+                <i class="fas fa-play"></i> Explorar
+              </button>
+              <button class="btn-secondary" 
+                      (click)="compartirCategoria(categoria); $event.stopPropagation()"
+                      [attr.aria-label]="'Compartir categoría ' + categoria.nombre"
+                      title="Compartir categoría">
+                <i class="fas fa-share"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Estado vacío -->
+      <div *ngIf="!cargandoCategorias && categoriasFiltradas.length === 0" class="empty-state">
+        <i class="fas fa-search"></i>
+        <h3>No se encontraron categorías</h3>
+        <p>Intenta ajustar los filtros de búsqueda</p>
+        <button class="btn-reset" (click)="busquedaTexto = ''; filtroNivel = 'todos'; aplicarFiltros()">
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+  
+    <!-- Vista: Detalle de Categoría -->
+    <div *ngIf="vistaActual === 'detalle' && categoriaSeleccionada" class="categoria-detalle">
+      
+      <!-- Header del detalle -->
+      <div class="detalle-header">
+        <button class="btn-back" (click)="volverACategorias()">
+          <i class="fas fa-arrow-left"></i> Volver a categorías
+        </button>
+        
+        <div class="categoria-hero" [style.background]="'linear-gradient(135deg, ' + categoriaSeleccionada.color + '20, ' + categoriaSeleccionada.color + '10)'">
+          <div class="hero-content">
+            <div class="hero-icon" [style.background]="categoriaSeleccionada.color">
+              {{ categoriaSeleccionada.icono }}
+            </div>
+            <div class="hero-info">
+              <h2 [style.color]="categoriaSeleccionada.color">{{ categoriaSeleccionada.nombre }}</h2>
+              <p>{{ categoriaSeleccionada.descripcion }}</p>
+              
+              <div class="hero-stats">
+                <div class="hero-stat">
+                  <span class="numero">{{ categoriaSeleccionada.ejerciciosCount }}</span>
+                  <span class="label">Ejercicios</span>
+                </div>
+                <div class="hero-stat">
+                  <span class="numero">{{ categoriaSeleccionada.tiempoPromedio }}</span>
+                  <span class="label">Min promedio</span>
+                </div>
+                <div class="hero-stat">
+                  <span class="numero">{{ categoriaSeleccionada.caloriasPromedio }}</span>
+                  <span class="label">Cal promedio</span>
+                </div>
+                <div class="hero-stat">
+                  <span class="numero">{{ categoriaSeleccionada.popularidad }}%</span>
+                  <span class="label">Popularidad</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Información detallada -->
+      <div class="detalle-contenido">
+        
+        <!-- Beneficios -->
+        <div class="seccion-detalle">
+          <h3><i class="fas fa-trophy" [style.color]="categoriaSeleccionada.color"></i> Beneficios</h3>
+          <div class="beneficios-grid">
+            <div *ngFor="let beneficio of categoriaSeleccionada.beneficios" class="beneficio-item">
+              <i class="fas fa-check-circle" [style.color]="categoriaSeleccionada.color"></i>
+              <span>{{ beneficio }}</span>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Equipamiento -->
+        <div class="seccion-detalle">
+          <h3><i class="fas fa-tools" [style.color]="categoriaSeleccionada.color"></i> Equipamiento Requerido</h3>
+          <div class="equipamiento-lista">
+            <div *ngFor="let equipo of categoriaSeleccionada.equipamientoRequerido" class="equipamiento-item">
+              <i class="fas fa-dumbbell" [style.color]="categoriaSeleccionada.color"></i>
+              <span>{{ equipo }}</span>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Músculos principales -->
+        <div class="seccion-detalle">
+          <h3><i class="fas fa-user-md" [style.color]="categoriaSeleccionada.color"></i> Músculos Principales</h3>
+          <div class="musculos-lista">
+            <span *ngFor="let musculo of categoriaSeleccionada.musculosPrincipales" 
+                  class="musculo-tag" 
+                  [style.background-color]="categoriaSeleccionada.color + '20'" 
+                  [style.border-color]="categoriaSeleccionada.color"
+                  [style.color]="categoriaSeleccionada.color">
+              {{ musculo }}
+            </span>
+          </div>
+        </div>
+  
+        <!-- Ejercicios de la categoría -->
+        <div class="seccion-detalle ejercicios-seccion">
+          <h3><i class="fas fa-list" [style.color]="categoriaSeleccionada.color"></i> Ejercicios Disponibles</h3>
+          
+          <!-- Filtros por dificultad -->
+          <div class="dificultad-filtros">
+            <button class="dificultad-btn activo" data-dificultad="todas">Todos</button>
+            <button class="dificultad-btn" data-dificultad="fácil">Fácil</button>
+            <button class="dificultad-btn" data-dificultad="medio">Medio</button>
+            <button class="dificultad-btn" data-dificultad="difícil">Difícil</button>
+          </div>
+  
+          <!-- Loading de ejercicios -->
+          <div *ngIf="cargandoEjercicios" class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>Cargando ejercicios...</p>
+          </div>
+  
+          <!-- Grid de ejercicios -->
+          <div *ngIf="!cargandoEjercicios" class="ejercicios-grid">
+            <div *ngFor="let ejercicio of obtenerEjerciciosDeCategoria(categoriaSeleccionada.id)" 
+                 class="ejercicio-card" 
+                 (click)="verDetalleEjercicio(ejercicio)">
+              
+              <div class="ejercicio-imagen">
+                <img [src]="ejercicio.imagen" [alt]="ejercicio.nombre"
+                     onerror="this.src='assets/images/ejercicios/default.jpg'">
+                <div class="ejercicio-overlay">
+                  <span class="dificultad-badge" [class]="'dificultad-' + ejercicio.dificultad">
+                    {{ ejercicio.dificultad }}
+                  </span>
+                  <button class="btn-play" 
+                          [attr.aria-label]="'Reproducir video del ejercicio ' + ejercicio.nombre"
+                          title="Ver video del ejercicio">
+                    <i class="fas fa-play"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="ejercicio-info">
+                <h4>{{ ejercicio.nombre }}</h4>
+                <p>{{ ejercicio.descripcion }}</p>
+                
+                <div class="ejercicio-stats">
+                  <div class="stat">
+                    <i class="fas fa-clock"></i>
+                    <span>{{ ejercicio.duracion }}min</span>
+                  </div>
+                  <div class="stat">
+                    <i class="fas fa-fire"></i>
+                    <span>{{ ejercicio.calorias }}cal</span>
+                  </div>
+                </div>
+                
+                <button class="btn-ejercicio" [style.background]="categoriaSeleccionada.color" (click)="iniciarEjercicio(ejercicio); $event.stopPropagation()">
+                  Empezar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Modal: Detalle de Ejercicio -->
+    <div *ngIf="ejercicioActual" class="modal-overlay" (click)="cerrarDetalleEjercicio()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>{{ ejercicioActual.nombre }}</h3>
+          <button class="btn-close" 
+                  (click)="cerrarDetalleEjercicio()"
+                  aria-label="Cerrar ventana de detalles del ejercicio"
+                  title="Cerrar">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="ejercicio-detalle-grid">
+            
+            <!-- Imagen/Video -->
+            <div class="detalle-media">
+              <img [src]="ejercicioActual.imagen" 
+                   [alt]="'Imagen demostrativa del ejercicio ' + ejercicioActual.nombre"
+                   [title]="ejercicioActual.nombre"
+                   onerror="this.src='assets/images/ejercicios/default.jpg'">
+              <div class="media-info">
+                <span class="duracion">
+                  <i class="fas fa-clock"></i> {{ ejercicioActual.duracion }}min
+                </span>
+                <span class="calorias">
+                  <i class="fas fa-fire"></i> {{ ejercicioActual.calorias }}cal
+                </span>
+                <span class="dificultad" [class]="'dificultad-' + ejercicioActual.dificultad">
+                  {{ ejercicioActual.dificultad }}
+                </span>
+              </div>
+            </div>
+            
+            <!-- Información -->
+            <div class="detalle-info">
+              <div class="descripcion-ejercicio">
+                <h4>Descripción</h4>
+                <p>{{ ejercicioActual.descripcion }}</p>
+              </div>
+              
+              <!-- Instrucciones -->
+              <div class="instrucciones">
+                <h4>Instrucciones</h4>
+                <ol>
+                  <li *ngFor="let instruccion of ejercicioActual.instrucciones">
+                    {{ instruccion }}
+                  </li>
+                </ol>
+              </div>
+              
+              <!-- Variaciones -->
+              <div class="variaciones" *ngIf="ejercicioActual.variaciones && ejercicioActual.variaciones.length > 0">
+                <h4>Variaciones</h4>
+                <ul>
+                  <li *ngFor="let variacion of ejercicioActual.variaciones">
+                    {{ variacion }}
+                  </li>
+                </ul>
+              </div>
+              
+              <!-- Precauciones -->
+              <div class="precauciones" *ngIf="ejercicioActual.precauciones && ejercicioActual.precauciones.length > 0">
+                <h4>Precauciones</h4>
+                <ul class="precauciones-lista">
+                  <li *ngFor="let precaucion of ejercicioActual.precauciones">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    {{ precaucion }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Acciones del modal -->
+          <div class="modal-actions">
+            <button class="btn-primary-modal" 
+                    [style.background]="categoriaActual?.color || '#667eea'"
+                    (click)="iniciarEjercicio(ejercicioActual!)">
+              <i class="fas fa-play"></i> Iniciar Ejercicio
+            </button>
+            <button class="btn-secondary-modal" (click)="cerrarDetalleEjercicio()">
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

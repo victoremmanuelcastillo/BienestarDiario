@@ -1,0 +1,536 @@
+<!-- src/app/ejercicio/recomendaciones/recomendaciones.component.html -->
+<div class="recomendaciones-container">
+  <!-- Header de navegación -->
+  <div class="header-nav">
+    <h2 class="main-title">🎯 Recomendaciones Personalizadas</h2>
+    <div class="nav-tabs">
+      <button 
+        class="nav-tab" 
+        [class.active]="vistaActual === 'recomendaciones'"
+        (click)="cambiarVista('recomendaciones')">
+        <i class="fas fa-star"></i> Recomendaciones
+      </button>
+      <button 
+        class="nav-tab" 
+        [class.active]="vistaActual === 'planes'"
+        (click)="cambiarVista('planes')">
+        <i class="fas fa-calendar-alt"></i> Planes
+      </button>
+      <button 
+        class="nav-tab" 
+        [class.active]="vistaActual === 'perfil'"
+        (click)="cambiarVista('perfil')">
+        <i class="fas fa-user-cog"></i> Mi Perfil
+      </button>
+    </div>
+  </div>
+
+  <!-- Vista de Recomendaciones -->
+  <div *ngIf="vistaActual === 'recomendaciones'" class="recomendaciones-content">
+    
+    <!-- Filtros -->
+    <div class="filtros-section">
+      <div class="filtros-container">
+        <div class="filtro-grupo">
+          <label for="filtro-categoria">Categoría:</label>
+          <select id="filtro-categoria" [(ngModel)]="filtroCategoria" (change)="aplicarFiltros()" class="filtro-select" aria-label="Filtrar recomendaciones por categoría">
+            <option value="todos">Todas las categorías</option>
+            <option *ngFor="let cat of categoriasDisponibles" [value]="cat.id">
+              {{ cat.icono }} {{ cat.nombre }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="filtro-grupo">
+          <label for="filtro-nivel">Nivel:</label>
+          <select id="filtro-nivel" [(ngModel)]="filtroNivel" (change)="aplicarFiltros()" class="filtro-select" aria-label="Filtrar recomendaciones por nivel de dificultad">
+            <option value="todos">Todos los niveles</option>
+            <option value="principiante">Principiante</option>
+            <option value="intermedio">Intermedio</option>
+            <option value="avanzado">Avanzado</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recomendaciones Destacadas -->
+    <div class="section">
+      <h3 class="section-title">🌟 Especialmente para ti</h3>
+      <p class="section-subtitle">Basado en tu perfil y objetivos</p>
+      
+      <div *ngIf="cargandoRecomendaciones" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Generando recomendaciones personalizadas...</p>
+      </div>
+
+      <div *ngIf="!cargandoRecomendaciones" class="recomendaciones-grid">
+        <div *ngFor="let rec of recomendacionesPersonalizadas" class="recomendacion-card destacada">
+          <div class="card-header">
+            <span class="puntuacion-badge">{{ rec.puntuacion }}% Match</span>
+            <button class="fav-btn" 
+                    [class.favorita]="esFavorito(rec)"
+                    (click)="marcarComoFavorito(rec)"
+                    [attr.aria-label]="'Marcar ' + rec.titulo + ' como favorito'"
+                    title="Marcar como favorito">
+              <i [class]="esFavorito(rec) ? 'fas fa-heart' : 'far fa-heart'"></i>
+            </button>
+          </div>
+          
+          <div class="card-image">
+            <img [src]="rec.imagen" 
+                 [alt]="'Imagen del ejercicio recomendado: ' + rec.titulo" 
+                 [title]="rec.titulo" 
+                 onerror="this.src='assets/images/categorias/default.png'">
+            <div class="overlay">
+              <span class="categoria-tag">{{ obtenerIconoCategoria(rec.categoria) }} {{ obtenerNombreCategoria(rec.categoria) }}</span>
+            </div>
+          </div>
+          
+          <div class="card-content">
+            <h4>{{ rec.titulo }}</h4>
+            <p class="descripcion">{{ rec.descripcion }}</p>
+            
+            <div class="razon-recomendacion">
+              <i class="fas fa-lightbulb"></i>
+              <span>{{ rec.razon }}</span>
+            </div>
+            
+            <div class="stats-row">
+              <div class="stat">
+                <i class="fas fa-clock"></i>
+                <span>{{ rec.duracion }}min</span>
+              </div>
+              <div class="stat">
+                <i class="fas fa-fire"></i>
+                <span>{{ rec.calorias }}cal</span>
+              </div>
+              <div class="stat">
+                <i class="fas fa-signal"></i>
+                <span>{{ rec.nivel }}</span>
+              </div>
+            </div>
+            
+            <div class="beneficios">
+              <span *ngFor="let beneficio of rec.beneficios" class="beneficio-tag">
+                {{ beneficio }}
+              </span>
+            </div>
+            
+            <div class="card-actions">
+              <button class="btn-primary" (click)="iniciarEjercicio(rec)">
+                <i class="fas fa-play"></i> Empezar
+              </button>
+              <button class="btn-secondary" 
+                      (click)="compartirRecomendacion(rec)"
+                      [attr.aria-label]="'Compartir recomendación: ' + rec.titulo"
+                      title="Compartir recomendación">
+                <i class="fas fa-share"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Todas las Recomendaciones -->
+    <div class="section">
+      <h3 class="section-title">💡 Más recomendaciones</h3>
+      
+      <div class="recomendaciones-grid">
+        <div *ngFor="let rec of recomendaciones" class="recomendacion-card">
+          <div class="card-header">
+            <span class="nivel-badge" [class]="'nivel-' + rec.nivel">{{ rec.nivel }}</span>
+            <button class="fav-btn" 
+                    [class.favorita]="esFavorito(rec)"
+                    (click)="marcarComoFavorito(rec)"
+                    [attr.aria-label]="'Marcar ' + rec.titulo + ' como favorito'"
+                    title="Marcar como favorito">
+              <i [class]="esFavorito(rec) ? 'fas fa-heart' : 'far fa-heart'"></i>
+            </button>
+          </div>
+          
+          <div class="card-image">
+            <img [src]="rec.imagen" 
+                 [alt]="'Imagen del ejercicio: ' + rec.titulo" 
+                 [title]="rec.titulo" 
+                 onerror="this.src='assets/images/categorias/default.png'">
+            <div class="overlay">
+              <span class="categoria-tag">{{ obtenerIconoCategoria(rec.categoria) }} {{ obtenerNombreCategoria(rec.categoria) }}</span>
+            </div>
+          </div>
+          
+          <div class="card-content">
+            <h4>{{ rec.titulo }}</h4>
+            <p class="descripcion">{{ rec.descripcion }}</p>
+            
+            <div class="stats-row">
+              <div class="stat">
+                <i class="fas fa-clock"></i>
+                <span>{{ rec.duracion }}min</span>
+              </div>
+              <div class="stat">
+                <i class="fas fa-fire"></i>
+                <span>{{ rec.calorias }}cal</span>
+              </div>
+            </div>
+            
+            <div class="equipamiento">
+              <strong>Equipamiento:</strong>
+              <span *ngFor="let equipo of rec.equipamiento; let last = last">
+                {{ equipo }}<span *ngIf="!last">, </span>
+              </span>
+            </div>
+            
+            <div class="card-actions">
+              <button class="btn-primary" (click)="iniciarEjercicio(rec)">
+                <i class="fas fa-play"></i> Empezar
+              </button>
+              <button class="btn-secondary" 
+                      (click)="compartirRecomendacion(rec)"
+                      [attr.aria-label]="'Compartir recomendación: ' + rec.titulo"
+                      title="Compartir recomendación">
+                <i class="fas fa-share"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vista de Planes Personalizados -->
+  <div *ngIf="vistaActual === 'planes'" class="planes-content">
+    <div class="section">
+      <h3 class="section-title">📅 Planes de Entrenamiento Personalizados</h3>
+      <p class="section-subtitle">Programas completos diseñados para tus objetivos</p>
+      
+      <div class="planes-grid">
+        <div *ngFor="let plan of planesPersonalizados" class="plan-card">
+          <div class="plan-header">
+            <h4>{{ plan.nombre }}</h4>
+            <span class="duracion-badge">{{ plan.duracion }}</span>
+          </div>
+          
+          <div class="plan-info">
+            <div class="objetivo">
+              <i class="fas fa-target"></i>
+              <span>{{ plan.objetivo }}</span>
+            </div>
+            
+            <div class="frecuencia">
+              <i class="fas fa-calendar"></i>
+              <span>{{ plan.frecuencia }}</span>
+            </div>
+            
+            <p class="plan-descripcion">{{ plan.descripcion }}</p>
+          </div>
+          
+          <div class="plan-stats">
+            <div class="stat">
+              <span class="stat-number">{{ plan.ejercicios.length }}</span>
+              <span class="stat-label">Ejercicios</span>
+            </div>
+            <div class="stat">
+              <span class="stat-number">{{ calcularTiempoTotal(plan.ejercicios) }}</span>
+              <span class="stat-label">Min/sesión</span>
+            </div>
+            <div class="stat">
+              <span class="stat-number">{{ calcularCaloriasTotal(plan.ejercicios) }}</span>
+              <span class="stat-label">Calorías</span>
+            </div>
+          </div>
+          
+          <div class="plan-preview">
+            <h5>Ejercicios incluidos:</h5>
+            <div class="ejercicios-preview">
+              <div *ngFor="let ejercicio of plan.ejercicios" class="ejercicio-mini">
+                <img [src]="ejercicio.imagen" 
+                     [alt]="'Imagen del ejercicio incluido en el plan: ' + ejercicio.titulo"
+                     [title]="ejercicio.titulo"
+                     onerror="this.src='assets/images/categorias/default.png'">
+                <span>{{ ejercicio.titulo }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="plan-actions">
+            <button class="btn-plan-primary" (click)="seguirPlan(plan)">
+              <i class="fas fa-play-circle"></i> Seguir Plan
+            </button>
+            <button class="btn-plan-secondary" (click)="verDetallesPlan(plan)">
+              <i class="fas fa-info-circle"></i> Ver Detalles
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vista de Perfil -->
+  <div *ngIf="vistaActual === 'perfil'" class="perfil-content">
+    <div class="section">
+      <h3 class="section-title">👤 Configurar Mi Perfil</h3>
+      <p class="section-subtitle">Personaliza tus recomendaciones</p>
+      
+      <div class="perfil-form">
+        <!-- Nivel de Fitness -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-chart-line"></i> Nivel de Fitness
+          </label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" [(ngModel)]="perfilUsuario.nivel" value="principiante">
+              <span class="radio-custom"></span>
+              <div class="radio-content">
+                <strong>Principiante</strong>
+                <small>Nuevo en el ejercicio</small>
+              </div>
+            </label>
+            <label class="radio-option">
+              <input type="radio" [(ngModel)]="perfilUsuario.nivel" value="intermedio">
+              <span class="radio-custom"></span>
+              <div class="radio-content">
+                <strong>Intermedio</strong>
+                <small>Experiencia regular</small>
+              </div>
+            </label>
+            <label class="radio-option">
+              <input type="radio" [(ngModel)]="perfilUsuario.nivel" value="avanzado">
+              <span class="radio-custom"></span>
+              <div class="radio-content">
+                <strong>Avanzado</strong>
+                <small>Experiencia extensa</small>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Tiempo Disponible -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-clock"></i> Tiempo Disponible por Sesión
+          </label>
+          <div class="slider-container">
+            <label for="tiempo-slider" class="sr-only">Seleccionar tiempo disponible en minutos</label>
+            <input type="range" 
+                   id="tiempo-slider"
+                   [(ngModel)]="perfilUsuario.tiempoDisponible" 
+                   min="15" max="120" step="15"
+                   class="time-slider"
+                   [attr.aria-label]="'Tiempo disponible: ' + perfilUsuario.tiempoDisponible + ' minutos'">
+            <div class="slider-labels">
+              <span>15 min</span>
+              <span class="current-time">{{ perfilUsuario.tiempoDisponible }} min</span>
+              <span>120 min</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Objetivos -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-bullseye"></i> Mis Objetivos
+          </label>
+          <div class="objetivos-grid">
+            <div *ngFor="let objetivo of objetivosDisponibles" 
+                 class="objetivo-card"
+                 [class.selected]="perfilUsuario.objetivos.includes(objetivo.id)"
+                 (click)="toggleObjetivo(objetivo.id)">
+              <div class="objetivo-icon">{{ objetivo.icono }}</div>
+              <span>{{ objetivo.nombre }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preferencias de Ejercicio -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-heart"></i> Preferencias de Ejercicio
+          </label>
+          <div class="preferencias-grid">
+            <div *ngFor="let categoria of categoriasDisponibles" 
+                 class="preferencia-card"
+                 [class.selected]="perfilUsuario.preferencias.includes(categoria.id)"
+                 (click)="togglePreferencia(categoria.id)">
+              <div class="preferencia-icon">{{ categoria.icono }}</div>
+              <span>{{ categoria.nombre }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Limitaciones -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fas fa-exclamation-triangle"></i> Limitaciones o Lesiones
+          </label>
+          <div class="limitaciones-container">
+            <div class="checkbox-group">
+              <label class="checkbox-option">
+                <input type="checkbox" value="rodilla">
+                <span class="checkbox-custom"></span>
+                Problemas de rodilla
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" value="espalda">
+                <span class="checkbox-custom"></span>
+                Problemas de espalda
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" value="hombro">
+                <span class="checkbox-custom"></span>
+                Problemas de hombro
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" value="muneca">
+                <span class="checkbox-custom"></span>
+                Problemas de muñeca
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="form-actions">
+          <button class="btn-save" (click)="actualizarPerfil()">
+            <i class="fas fa-save"></i> Guardar y Actualizar Recomendaciones
+          </button>
+          <button class="btn-reset" type="button">
+            <i class="fas fa-undo"></i> Restablecer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Confirmar Inicio de Ejercicio -->
+  <div *ngIf="mostrarModalEjercicio && ejercicioEnEjecucion" class="modal-overlay" (click)="cerrarModalEjercicio()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>🏃‍♂️ ¿Listo para entrenar?</h3>
+        <button class="btn-close" (click)="cerrarModalEjercicio()" aria-label="Cerrar modal" title="Cerrar">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="ejercicio-preview">
+          <img [src]="ejercicioEnEjecucion.imagen" 
+               [alt]="ejercicioEnEjecucion.titulo"
+               [title]="ejercicioEnEjecucion.titulo">
+          
+          <div class="ejercicio-info-modal">
+            <h4>{{ ejercicioEnEjecucion.titulo }}</h4>
+            <p>{{ ejercicioEnEjecucion.descripcion }}</p>
+            
+            <div class="stats-modal">
+              <div class="stat-modal">
+                <i class="fas fa-clock"></i>
+                <span>{{ ejercicioEnEjecucion.duracion }} minutos</span>
+              </div>
+              <div class="stat-modal">
+                <i class="fas fa-fire"></i>
+                <span>{{ ejercicioEnEjecucion.calorias }} calorías</span>
+              </div>
+              <div class="stat-modal">
+                <i class="fas fa-signal"></i>
+                <span>Nivel {{ ejercicioEnEjecucion.nivel }}</span>
+              </div>
+            </div>
+            
+            <div class="beneficios-modal">
+              <h5>Beneficios:</h5>
+              <ul>
+                <li *ngFor="let beneficio of ejercicioEnEjecucion.beneficios">{{ beneficio }}</li>
+              </ul>
+            </div>
+            
+            <div class="equipamiento-modal" *ngIf="ejercicioEnEjecucion.equipamiento.length > 0">
+              <h5>Equipamiento necesario:</h5>
+              <p>{{ ejercicioEnEjecucion.equipamiento.join(', ') }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn-modal-primary" (click)="comenzarEjercicioReal()">
+          <i class="fas fa-play"></i> ¡Empezar Ahora!
+        </button>
+        <button class="btn-modal-secondary" (click)="cerrarModalEjercicio()">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Confirmar Seguir Plan -->
+  <div *ngIf="mostrarModalPlan && planEnSeguimiento" class="modal-overlay" (click)="cerrarModalPlan()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>📅 ¿Activar este plan?</h3>
+        <button class="btn-close" (click)="cerrarModalPlan()" aria-label="Cerrar modal" title="Cerrar">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="plan-preview-modal">
+          <div class="plan-info-modal">
+            <h4>{{ planEnSeguimiento.nombre }}</h4>
+            <p>{{ planEnSeguimiento.descripcion }}</p>
+            
+            <div class="plan-detalles">
+              <div class="detalle-item">
+                <i class="fas fa-target"></i>
+                <span><strong>Objetivo:</strong> {{ planEnSeguimiento.objetivo }}</span>
+              </div>
+              <div class="detalle-item">
+                <i class="fas fa-calendar"></i>
+                <span><strong>Duración:</strong> {{ planEnSeguimiento.duracion }}</span>
+              </div>
+              <div class="detalle-item">
+                <i class="fas fa-clock"></i>
+                <span><strong>Frecuencia:</strong> {{ planEnSeguimiento.frecuencia }}</span>
+              </div>
+            </div>
+            
+            <div class="ejercicios-incluidos">
+              <h5>Ejercicios incluidos ({{ planEnSeguimiento.ejercicios.length }}):</h5>
+              <div class="ejercicios-lista-modal">
+                <div *ngFor="let ejercicio of planEnSeguimiento.ejercicios; let i = index" class="ejercicio-item-modal">
+                  <span class="numero">{{ i + 1 }}.</span>
+                  <img [src]="ejercicio.imagen" [alt]="ejercicio.titulo" [title]="ejercicio.titulo">
+                  <div class="ejercicio-detalle">
+                    <span class="nombre">{{ ejercicio.titulo }}</span>
+                    <span class="duracion">{{ ejercicio.duracion }}min - {{ ejercicio.calorias }}cal</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="resumen-plan">
+              <div class="resumen-stat">
+                <span class="numero">{{ calcularTiempoTotal(planEnSeguimiento.ejercicios) }}</span>
+                <span class="label">min por sesión</span>
+              </div>
+              <div class="resumen-stat">
+                <span class="numero">{{ calcularCaloriasTotal(planEnSeguimiento.ejercicios) }}</span>
+                <span class="label">calorías por sesión</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn-modal-primary" (click)="comenzarPlanReal()">
+          <i class="fas fa-rocket"></i> ¡Activar Plan!
+        </button>
+        <button class="btn-modal-secondary" (click)="cerrarModalPlan()">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

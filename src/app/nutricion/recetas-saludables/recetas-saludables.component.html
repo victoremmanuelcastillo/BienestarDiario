@@ -1,0 +1,244 @@
+<!-- recetas-saludables.component.html -->
+<div class="recipes-container">
+    <h2>Recetas Saludables</h2>
+    
+    <div class="tabs-container">
+      <div class="tabs">
+        <button 
+          class="tab-button" 
+          [class.active]="activeTab === 'search'"
+          (click)="activeTab = 'search'"
+        >
+          🔍 Buscar Recetas
+        </button>
+        <button 
+          class="tab-button" 
+          [class.active]="activeTab === 'favorites'"
+          (click)="activeTab = 'favorites'"
+        >
+          ❤️ Mis Favoritas
+        </button>
+        <button 
+          class="tab-button" 
+          [class.active]="activeTab === 'recent'"
+          (click)="activeTab = 'recent'"
+        >
+          🕒 Vistas Recientemente
+        </button>
+      </div>
+    </div>
+    
+    <!-- Pestaña de búsqueda -->
+    <div class="tab-content" *ngIf="activeTab === 'search'">
+      <form [formGroup]="searchForm" (ngSubmit)="searchRecipes()" class="search-form">
+        <div class="form-group">
+          <label for="query">Buscar recetas:</label>
+          <div class="input-group">
+            <input 
+              id="query" 
+              formControlName="query" 
+              placeholder="Ejemplo: Ensalada, Pollo, Vegetariano..." 
+              class="form-control"
+            >
+            <button type="submit" class="btn btn-primary" [disabled]="isLoadingRecipes">
+              <span *ngIf="!isLoadingRecipes">Buscar</span>
+              <span *ngIf="isLoadingRecipes">Buscando...</span>
+            </button>
+          </div>
+        </div>
+      </form>
+      
+      <div *ngIf="isLoadingRecipes" class="loading-indicator">
+        <div class="spinner"></div>
+        <p>Buscando recetas saludables...</p>
+      </div>
+      
+      <div *ngIf="recipes.length > 0" class="recipes-grid">
+        <div *ngFor="let recipe of recipes" class="recipe-card" (click)="viewRecipeDetails(recipe)">
+          <div class="recipe-image-container">
+            <img 
+              [src]="recipe.image || 'assets/images/recipe-placeholder.jpg'" 
+              [alt]="'Imagen de ' + recipe.title" 
+              class="recipe-image"
+              onerror="this.onerror=null; this.src='assets/images/recipe-placeholder.jpg';"
+            >
+            <button 
+              class="favorite-button" 
+              [class.active]="recipe.isFavorite"
+              (click)="toggleFavorite(recipe, $event)"
+              [attr.aria-label]="recipe.isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'"
+            >
+              <span *ngIf="recipe.isFavorite">❤️</span>
+              <span *ngIf="!recipe.isFavorite">🤍</span>
+            </button>
+          </div>
+          <div class="recipe-content">
+            <h3 class="recipe-title">{{ recipe.title }}</h3>
+            <div class="recipe-meta">
+              <span><i class="icon-time"></i> {{ recipe.readyInMinutes || '?' }} min</span>
+              <span><i class="icon-servings"></i> {{ recipe.servings || '?' }} porciones</span>
+            </div>
+            <button class="btn-view">Ver detalles</button>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="recipes.length === 0 && !isLoadingRecipes" class="no-results">
+        <p>No se encontraron recetas. Intenta con otra búsqueda.</p>
+      </div>
+    </div>
+    
+    <!-- Pestaña de favoritos -->
+    <div class="tab-content" *ngIf="activeTab === 'favorites'">
+      <div *ngIf="favoriteRecipes.length > 0" class="recipes-grid">
+        <div *ngFor="let recipe of favoriteRecipes" class="recipe-card" (click)="viewRecipeDetails(recipe)">
+          <div class="recipe-image-container">
+            <img 
+              [src]="recipe.image || 'assets/images/recipe-placeholder.jpg'" 
+              [alt]="'Imagen de ' + recipe.title" 
+              class="recipe-image"
+              onerror="this.onerror=null; this.src='assets/images/recipe-placeholder.jpg';"
+            >
+            <button 
+              class="favorite-button active" 
+              (click)="toggleFavorite(recipe, $event)"
+              aria-label="Quitar de favoritos"
+            >
+              <span>❤️</span>
+            </button>
+          </div>
+          <div class="recipe-content">
+            <h3 class="recipe-title">{{ recipe.title }}</h3>
+            <div class="recipe-meta">
+              <span><i class="icon-time"></i> {{ recipe.readyInMinutes || '?' }} min</span>
+              <span><i class="icon-servings"></i> {{ recipe.servings || '?' }} porciones</span>
+            </div>
+            <button class="btn-view">Ver detalles</button>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="favoriteRecipes.length === 0" class="no-results">
+        <p>No tienes recetas favoritas guardadas. Marca algunas recetas como favoritas para verlas aquí.</p>
+      </div>
+    </div>
+    
+    <!-- Pestaña de recientes -->
+    <div class="tab-content" *ngIf="activeTab === 'recent'">
+      <div *ngIf="recentlyViewedRecipes.length > 0" class="recipes-grid">
+        <div *ngFor="let recipe of recentlyViewedRecipes" class="recipe-card" (click)="viewRecipeDetails(recipe)">
+          <div class="recipe-image-container">
+            <img 
+              [src]="recipe.image || 'assets/images/recipe-placeholder.jpg'" 
+              [alt]="'Imagen de ' + recipe.title" 
+              class="recipe-image"
+              onerror="this.onerror=null; this.src='assets/images/recipe-placeholder.jpg';"
+            >
+            <button 
+              class="favorite-button" 
+              [class.active]="recipe.isFavorite"
+              (click)="toggleFavorite(recipe, $event)"
+              [attr.aria-label]="recipe.isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'"
+            >
+              <span *ngIf="recipe.isFavorite">❤️</span>
+              <span *ngIf="!recipe.isFavorite">🤍</span>
+            </button>
+            <div class="viewed-date">
+              {{ recipe.viewedAt | date:'dd/MM/yyyy' }}
+            </div>
+          </div>
+          <div class="recipe-content">
+            <h3 class="recipe-title">{{ recipe.title }}</h3>
+            <div class="recipe-meta">
+              <span><i class="icon-time"></i> {{ recipe.readyInMinutes || '?' }} min</span>
+              <span><i class="icon-servings"></i> {{ recipe.servings || '?' }} porciones</span>
+            </div>
+            <button class="btn-view">Ver detalles</button>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="recentlyViewedRecipes.length === 0" class="no-results">
+        <p>No has visto ninguna receta recientemente.</p>
+      </div>
+    </div>
+    
+    <!-- Modal de detalles de receta (reutilizado del componente original) -->
+    <div *ngIf="selectedRecipe" class="recipe-modal">
+      <div class="recipe-modal-content">
+        <button (click)="closeRecipeDetails()" class="close-button" aria-label="Cerrar detalles de receta" title="Cerrar">×</button>
+        
+        <div *ngIf="isLoadingDetails" class="loading-indicator">
+          <div class="spinner"></div>
+          <p>Cargando detalles de la receta...</p>
+        </div>
+        
+        <div *ngIf="recipeDetails && !isLoadingDetails" class="recipe-details">
+          <div class="recipe-header">
+            <h2 class="recipe-detail-title">{{ recipeDetails.translatedTitle || recipeDetails.title || 'Receta sin título' }}</h2>
+            <button 
+              class="favorite-button-large" 
+              [class.active]="selectedRecipe.isFavorite"
+              (click)="toggleFavorite(selectedRecipe)"
+            >
+              <span *ngIf="selectedRecipe.isFavorite">❤️ Quitar de favoritos</span>
+              <span *ngIf="!selectedRecipe.isFavorite">🤍 Añadir a favoritos</span>
+            </button>
+          </div>
+          
+          <!-- Añadir esto dentro del div recipe-details en el modal -->
+<div class="recipe-image-full">
+  <img 
+    [src]="recipeDetails.image || 'assets/images/recipe-placeholder.jpg'" 
+    [alt]="'Imagen de ' + recipeDetails.title" 
+    class="full-width-image"
+    onerror="this.onerror=null; this.src='assets/images/recipe-placeholder.jpg';"
+  >
+</div>
+
+<div class="recipe-summary" [innerHTML]="recipeDetails.summary"></div>
+
+<div class="recipe-info-grid">
+  <div class="recipe-info-item">
+    <h4>Tiempo de preparación</h4>
+    <p>{{ recipeDetails.readyInMinutes || '?' }} minutos</p>
+  </div>
+  <div class="recipe-info-item">
+    <h4>Porciones</h4>
+    <p>{{ recipeDetails.servings || '?' }}</p>
+  </div>
+  <div class="recipe-info-item" *ngIf="recipeDetails.diets && recipeDetails.diets.length > 0">
+    <h4>Dietas</h4>
+    <div class="tags">
+      <span class="tag" *ngFor="let diet of recipeDetails.diets">{{ diet }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="recipe-section">
+  <h3>Ingredientes</h3>
+  <ul class="ingredients-list">
+    <li *ngFor="let ingredient of recipeDetails.extendedIngredients">
+      {{ ingredient.original }}
+    </li>
+  </ul>
+</div>
+
+<div class="recipe-section">
+  <h3>Instrucciones</h3>
+  <div class="instructions" [innerHTML]="recipeDetails.translatedInstructions || recipeDetails.instructions"></div>
+</div>
+
+<div class="recipe-section" *ngIf="recipeDetails.nutrition">
+  <h3>Información Nutricional</h3>
+  <div class="nutrition-grid">
+    <div class="nutrition-item" *ngFor="let nutrient of recipeDetails.nutrition.nutrients.slice(0, 8)">
+      <div class="nutrient-name">{{ nutrient.name }}</div>
+      <div class="nutrient-value">{{ nutrient.amount | number:'1.0-1' }} {{ nutrient.unit }}</div>
+    </div>
+  </div>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>

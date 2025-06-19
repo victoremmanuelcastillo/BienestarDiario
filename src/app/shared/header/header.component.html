@@ -1,4 +1,3 @@
-<!-- src/app/shared/header/header.component.html -->
 <header class="header">
   <div class="container">
     <div class="header-content">
@@ -12,24 +11,46 @@
       
       <nav class="main-nav" [class.active]="menuActive">
         <ul class="nav-list">
-          <li class="nav-item">
-            <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a>
+          <li class="nav-item dropdown">
+            <a (click)="navigateToSection('inicio')" 
+               class="dropdown-toggle main-section-link" 
+               [class.active]="currentSection === 'inicio'">
+               Inicio
+            </a>
+            <ul class="dropdown-menu" [class.show]="activeDropdown === 'inicio'">
+              <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Dashboard</a></li>
+              <li><a routerLink="/graficas-habitos" routerLinkActive="active">Gráficas de Hábitos</a></li>
+              <li><a routerLink="/motivacion" routerLinkActive="active">Motivación</a></li>
+              <li><a routerLink="/ChatIA" routerLinkActive="active">Chat IA</a></li>
+            </ul>
           </li>
-          <li class="nav-item">
-            <a routerLink="/nutricion" routerLinkActive="active">Nutrición</a>
+          <li class="nav-item dropdown">
+            <a (click)="navigateToSection('nutricion')" 
+               class="dropdown-toggle main-section-link" 
+               [class.active]="currentSection === 'nutricion'">
+               Nutrición
+            </a>
+            <ul class="dropdown-menu" [class.show]="activeDropdown === 'nutricion'">
+              <li><a routerLink="/nutricion" routerLinkActive="active">Nutrición</a></li>
+              <li><a routerLink="/nutricion/calculadora-imc" routerLinkActive="active">Calculadora IMC</a></li>
+              <li><a routerLink="/nutricion/recetas-saludables" routerLinkActive="active">Recetas Saludables</a></li>
+              <li><a routerLink="/nutricion/calculadora-nutricional" routerLinkActive="active">Calculadora Nutricional</a></li>
+              <li><a routerLink="/nutricion/graficas-nutricion" routerLinkActive="active">Gráficas</a></li>
+              <li><a routerLink="/ChatIA" routerLinkActive="active">Chat IA</a></li>
+            </ul>
           </li>
-          <li class="nav-item">
-            <a routerLink="/ejercicio" routerLinkActive="active">Ejercicio</a>
-          </li>
-          <li class="nav-item">
-            <a routerLink="/sueno" routerLinkActive="active">Sueño</a>
-          </li>
-          <li class="nav-item">
-            <a routerLink="/meditacion" routerLinkActive="active">Meditación</a>
-          </li>
-          <li class="nav-item">
-            <a routerLink="/blog" routerLinkActive="active">Blog</a>
-          </li>
+          <li class="nav-item dropdown">
+            <a (click)="navigateToSection('ejercicio')" 
+               class="dropdown-toggle main-section-link" 
+               [class.active]="currentSection === 'ejercicio'">
+               Ejercicio
+            </a>
+            <ul class="dropdown-menu" [class.show]="activeDropdown === 'ejercicio'">
+              <li><a routerLink="/ejercicio/categorias" routerLinkActive="active">Categorías</a></li>
+              <li><a routerLink="/ejercicio/rutinas" routerLinkActive="active">Mis Rutinas</a></li>
+              <li><a routerLink="/ejercicio/recomendaciones" routerLinkActive="active">Recomendaciones</a></li>
+              <li><a routerLink="/ejercicio/graficas" routerLinkActive="active">Gráficas</a></li>
+            </ul>
         </ul>
       </nav>
       
@@ -43,6 +64,26 @@
           <a routerLink="/profile" class="btn btn-outline">Mi perfil</a>
           <button (click)="logout()" class="btn btn-primary">Cerrar sesión</button>
         </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de navegación secundaria -->
+  <div class="secondary-nav" [class.scrolled]="isScrolled" *ngIf="getCurrentSectionItems().length > 1">
+    <div class="container">
+      <div class="secondary-nav-content">
+        <div class="section-indicator">
+          <span class="section-name">{{ currentSection | titlecase }}</span>
+        </div>
+        <nav class="secondary-nav-items">
+          <a *ngFor="let item of getCurrentSectionItems()" 
+             [routerLink]="item.route" 
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{exact: item.route === '/'}"
+             class="secondary-nav-item">
+            {{ item.label }}
+          </a>
+        </nav>
       </div>
     </div>
   </div>

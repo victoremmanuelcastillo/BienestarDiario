@@ -41,18 +41,28 @@ export class RegisterComponent {
   get password() { return this.registerForm.get('password'); }
   get confirmPassword() { return this.registerForm.get('confirmPassword'); }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.registerForm.valid) {
       const { name, email, password } = this.registerForm.value;
       
       // Verificar que los valores no sean undefined
       if (name && email && password) {
-        const success = this.authService.register(name, email, password);
+        this.isLoading = true;
+        this.errorMessage = '';
         
-        if (success) {
-          this.router.navigate(['/dashboard']);
-        } else {
+        try {
+          const success = await this.authService.register(name, email, password);
+          
+          if (success) {
+            this.router.navigate(['/dashboard']);
+          } else {
+            this.errorMessage = 'Error al registrar usuario. Por favor, intenta de nuevo.';
+          }
+        } catch (error) {
           this.errorMessage = 'Error al registrar usuario. Por favor, intenta de nuevo.';
+          console.error(error);
+        } finally {
+          this.isLoading = false;
         }
       }
     } else {

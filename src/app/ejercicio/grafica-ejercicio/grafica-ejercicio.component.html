@@ -1,0 +1,193 @@
+<!-- src/app/ejercicio/grafica-ejercicio/grafica-ejercicio.component.html -->
+<div class="graficas-container">
+    <!-- Header -->
+    <div class="header-section">
+      <h2 class="section-title"> Estadísticas de Ejercicio</h2>
+      <p class="section-subtitle">Analiza tu progreso y rendimiento en los entrenamientos</p>
+      
+      <!-- Controles de período -->
+      <div class="period-controls">
+        <button class="period-btn" 
+                [class.active]="periodoActual === 'semana'"
+                (click)="cambiarPeriodo('semana')">Esta Semana</button>
+        <button class="period-btn" 
+                [class.active]="periodoActual === 'mes'"
+                (click)="cambiarPeriodo('mes')">Este Mes</button>
+        <button class="period-btn" 
+                [class.active]="periodoActual === 'año'"
+                (click)="cambiarPeriodo('año')">Este Año</button>
+        
+      </div>
+    </div>
+  
+    <!-- Tarjetas de resumen -->
+    <div class="stats-cards">
+      <div class="stat-card">
+        <div class="stat-icon">🏃‍♂️</div>
+        <div class="stat-info">
+          <h3>{{ totalEjercicios }}</h3>
+          <p>Ejercicios Completados</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">⏱️</div>
+        <div class="stat-info">
+          <h3>{{ tiempoTotal }} min</h3>
+          <p>Tiempo Total</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-info">
+          <h3>{{ caloriasTotal }}</h3>
+          <p>Calorías Quemadas</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-info">
+          <h3>{{ promedioSemanal }} min</h3>
+          <p>Promedio Diario</p>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Grid de gráficas -->
+    <div class="charts-grid">
+      <!-- Gráfica de Progreso -->
+      <div class="chart-container">
+        <div class="chart-header">
+          <h3>Progreso de Entrenamientos</h3>
+          <div class="chart-legend">
+            <span class="legend-item">
+              <span class="legend-color legend-color-primary"></span>
+              Duración en minutos
+            </span>
+          </div>
+        </div>
+        <div class="chart-wrapper">
+          <canvas #chartProgreso></canvas>
+        </div>
+      </div>
+  
+      <!-- Gráfica de Calorías -->
+      <div class="chart-container">
+        <div class="chart-header">
+          <h3>Calorías por Día</h3>
+          <div class="chart-info">
+            <span class="info-badge">Promedio: {{ Math.round(caloriasTotal / 7) }} cal/día</span>
+          </div>
+        </div>
+        <div class="chart-wrapper">
+          <canvas #chartCalorias></canvas>
+        </div>
+      </div>
+  
+      <!-- Gráfica de Categorías -->
+      <div class="chart-container">
+        <div class="chart-header">
+          <h3>Distribución de Ejercicios</h3>
+          <div class="chart-info">
+            <span class="info-badge">Por categorías</span>
+          </div>
+        </div>
+        <div class="chart-wrapper doughnut-wrapper">
+          <canvas #chartCategorias></canvas>
+        </div>
+      </div>
+  
+      <!-- Gráfica Radar -->
+      <div class="chart-container">
+        <div class="chart-header">
+          <h3>Análisis de Rendimiento</h3>
+          <div class="chart-info">
+            <span class="info-badge">Vista general</span>
+          </div>
+        </div>
+        <div class="chart-wrapper radar-wrapper">
+          <canvas #chartSemanal></canvas>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Tabla de progreso semanal -->
+    <div class="progress-table-container">
+      <h3>Resumen Semanal</h3>
+      <div class="table-wrapper">
+        <table class="progress-table">
+          <thead>
+            <tr>
+              <th>Período</th>
+              <th>Entrenamientos</th>
+              <th>Tiempo Total</th>
+              <th>Calorías</th>
+              <th>Tendencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let progreso of progresoMensual; let i = index">
+              <td>{{ progreso.semana }}</td>
+              <td>
+                <span class="metric-badge">{{ progreso.entrenamientos }}</span>
+              </td>
+              <td>{{ progreso.tiempoTotal }} min</td>
+              <td>{{ progreso.caloriasQuemadas }} cal</td>
+              <td>
+                <span class="trend-indicator" 
+                      [ngClass]="{
+                        'trend-up': i > 0 && progreso.entrenamientos > progresoMensual[i-1].entrenamientos,
+                        'trend-down': i > 0 && progreso.entrenamientos < progresoMensual[i-1].entrenamientos
+                      }">
+                  <i class="fas fa-arrow-up" *ngIf="i > 0 && progreso.entrenamientos > progresoMensual[i-1].entrenamientos"></i>
+                  <i class="fas fa-arrow-down" *ngIf="i > 0 && progreso.entrenamientos < progresoMensual[i-1].entrenamientos"></i>
+                  <i class="fas fa-minus" *ngIf="i === 0 || progreso.entrenamientos === progresoMensual[i-1].entrenamientos"></i>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  
+    <!-- Sección de metas -->
+    <div class="goals-section">
+      <h3>🎯 Metas de la Semana</h3>
+      <div class="goals-grid">
+        <div class="goal-card">
+          <div class="goal-progress">
+            <div class="progress-circle" 
+                 [attr.data-progress]="Math.min(Math.round((totalEjercicios / 50) * 100), 100)">
+              <span>{{ totalEjercicios }}/50</span>
+            </div>
+          </div>
+          <h4>Ejercicios</h4>
+          <p>Meta semanal</p>
+        </div>
+        
+        <div class="goal-card">
+          <div class="goal-progress">
+            <div class="progress-circle" 
+                 [attr.data-progress]="Math.min(Math.round((tiempoTotal / 300) * 100), 100)">
+              <span>{{ tiempoTotal }}/300</span>
+            </div>
+          </div>
+          <h4>Minutos</h4>
+          <p>Meta semanal</p>
+        </div>
+        
+        <div class="goal-card">
+          <div class="goal-progress">
+            <div class="progress-circle" 
+                 [attr.data-progress]="Math.min(Math.round((caloriasTotal / 2500) * 100), 100)">
+              <span>{{ caloriasTotal }}/2500</span>
+            </div>
+          </div>
+          <h4>Calorías</h4>
+          <p>Meta semanal</p>
+        </div>
+      </div>
+    </div>
+  </div>

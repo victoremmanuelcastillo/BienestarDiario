@@ -1,113 +1,147 @@
 // src/app/ejercicio/ejercicio.component.ts
 import { Component, OnInit } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { EjercicioService } from '../services/ejercicio.service';
+import { EjercicioService, Categoria, Ejercicio } from '../services/ejercicio.service';
 
 @Component({
   selector: 'app-ejercicio',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
   templateUrl: './ejercicio.component.html',
-  styleUrls: ['./ejercicio.component.css']
+  styleUrls: ['./ejercicio.component.css'],
+  imports: [CommonModule],
+  standalone: true
 })
 export class EjercicioComponent implements OnInit {
-  categories: any[] = [];
-  exercises: any[] = [];
-  selectedCategory: number | null = null;
-  selectedExercise: any = null;
-  exerciseDetails: any = null;
-  exerciseImages: any[] = [];
-  workoutRoutines: any[] = [];
-  isLoading = false;
-  activeTab = 'exercises'; // 'exercises' o 'routines'
+  categorias: Categoria[] = [];
+  ejerciciosPorCategoria: { [key: string]: any[] } = {};
+  categoriaSeleccionada: string | null = null;
+  ejercicioSeleccionado: Ejercicio | null = null;
+  cargando: boolean = false;
+  error: string | null = null;
 
-  constructor(private ejercicioService: EjercicioService) { }
+  constructor(
+    private ejercicioService: EjercicioService,
+    private sanitizer: DomSanitizer
+  ) { }
 
   ngOnInit(): void {
-    this.loadCategories();
-    this.loadWorkoutRoutines();
+    this.cargarCategorias();
   }
 
-  loadCategories(): void {
-    this.isLoading = true;
-    this.ejercicioService.getExerciseCategories().subscribe({
-      next: (data) => {
-        this.categories = data.results;
-        this.isLoading = false;
+  cargarCategorias(): void {
+    this.cargando = true;
+    this.ejercicioService.getCategorias().subscribe({
+      next: (data: Categoria[]) => {
+        this.categorias = data;
+        this.cargando = false;
       },
-      error: (error) => {
-        console.error('Error loading categories:', error);
-        this.isLoading = false;
+      error: (err: any) => {
+        console.error('Error al cargar categorías:', err);
+        this.error = 'No se pudieron cargar las categorías de ejercicios.';
+        this.cargando = false;
+        // Cargar datos de ejemplo en caso de error
+        this.categorias = this.ejercicioService.getCategoriasEjemplo();
       }
     });
   }
 
-  loadExercisesByCategory(categoryId: number): void {
-    this.selectedCategory = categoryId;
-    this.isLoading = true;
-    this.ejercicioService.getExercisesByCategory(categoryId).subscribe({
-      next: (data) => {
-        this.exercises = data.results;
-        this.isLoading = false;
+  seleccionarCategoria(categoria: Categoria): void {
+    this.categoriaSeleccionada = categoria.nombre;
+    this.ejercicioSeleccionado = null;
+    this.cargando = true;
+    
+    // Verificar si ya tenemos los ejercicios de esta categoría cargados
+    if (this.categoriaSeleccionada && this.ejerciciosPorCategoria[this.categoriaSeleccionada]) {
+      this.cargando = false;
+      return;
+    }
+    
+    this.ejercicioService.getEjerciciosPorCategoria(categoria.id).subscribe({
+      next: (data: Ejercicio[]) => {
+        if (this.categoriaSeleccionada) {
+          this.ejerciciosPorCategoria[this.categoriaSeleccionada] = data;
+        }
+        this.cargando = false;
       },
-      error: (error) => {
-        console.error('Error loading exercises:', error);
-        this.isLoading = false;
+      error: (err: any) => {
+        console.error(`Error al cargar ejercicios de ${categoria.nombre}:`, err);
+        this.error = `No se pudieron cargar los ejercicios de ${categoria.nombre}.`;
+        this.cargando = false;
+        // Cargar datos de ejemplo en caso de error
+        if (this.categoriaSeleccionada) {
+          this.ejerciciosPorCategoria[this.categoriaSeleccionada] = 
+            this.ejercicioService.getEjerciciosEjemploPorCategoria(categoria.id);
+        }
       }
     });
   }
 
-  loadExerciseDetails(exerciseId: number): void {
-    this.isLoading = true;
-    this.ejercicioService.getExerciseDetails(exerciseId).subscribe({
-      next: (data) => {
-        this.exerciseDetails = data;
-        this.loadExerciseImages(exerciseId);
-      },
-      error: (error) => {
-        console.error('Error loading exercise details:', error);
-        this.isLoading = false;
-      }
-    });
+  verDetallesEjercicio(ejercicio: Ejercicio): void {
+    this.ejercicioSeleccionado = ejercicio;
+    
+    // Si no hay instrucciones detalladas, cargarlas
+    if (!ejercicio.instrucciones || !ejercicio.video) {
+      this.cargando = true;
+      this.ejercicioService.getDetallesEjercicio(ejercicio.id).subscribe({
+        next: (data: Partial<Ejercicio>) => {
+          // Actualizar el ejercicio seleccionado con los detalles completos
+          if (this.ejercicioSeleccionado) {
+            this.ejercicioSeleccionado = { ...ejercicio, ...data };
+          }
+          this.cargando = false;
+        },
+        error: (err: any) => {
+          console.error(`Error al cargar detalles del ejercicio ${ejercicio.nombre}:`, err);
+          this.error = `No se pudieron cargar los detalles del ejercicio.`;
+          this.cargando = false;
+          
+          // Obtener detalles de ejemplo
+          const detallesEjemplo = this.ejercicioService.getDetallesEjercicioEjemplo(ejercicio.id);
+          if (this.ejercicioSeleccionado) {
+            this.ejercicioSeleccionado = { ...ejercicio, ...detallesEjemplo };
+          }
+        }
+      });
+    }
   }
 
-  loadExerciseImages(exerciseId: number): void {
-    this.ejercicioService.getExerciseImages(exerciseId).subscribe({
-      next: (data) => {
-        this.exerciseImages = data.results;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading exercise images:', error);
-        this.isLoading = false;
-      }
-    });
+  volverACategoria(): void {
+    this.ejercicioSeleccionado = null;
   }
 
-  loadWorkoutRoutines(): void {
-    this.ejercicioService.getWorkoutRoutines().subscribe({
-      next: (data) => {
-        this.workoutRoutines = data;
-      },
-      error: (error) => {
-        console.error('Error loading workout routines:', error);
-      }
-    });
+  volverACategorias(): void {
+    this.categoriaSeleccionada = null;
+    this.ejercicioSeleccionado = null;
   }
 
-  showExerciseDetails(exercise: any): void {
-    this.selectedExercise = exercise;
-    this.loadExerciseDetails(exercise.id);
+  // Método para sanitizar URLs de videos
+  getSafeVideoUrl(videoUrl: string | undefined): SafeResourceUrl {
+    if (!videoUrl) return this.sanitizer.bypassSecurityTrustResourceUrl('');
+    return this.sanitizer.bypassSecurityTrustResourceUrl(videoUrl);
   }
 
-  closeExerciseDetails(): void {
-    this.selectedExercise = null;
-    this.exerciseDetails = null;
-    this.exerciseImages = [];
+  // Métodos para manejar objetos posiblemente nulos
+  getNombre(objeto: any): string {
+    return objeto?.nombre || 'Sin nombre';
   }
 
-  setActiveTab(tab: string): void {
-    this.activeTab = tab;
+  getDescripcion(objeto: any): string {
+    return objeto?.descripcion || 'Sin descripción';
+  }
+
+  getMusculos(ejercicio: Ejercicio | null): string[] {
+    return ejercicio?.musculos || [];
+  }
+
+  getInstrucciones(ejercicio: Ejercicio | null): string[] {
+    return ejercicio?.instrucciones || [];
+  }
+
+  getDificultad(ejercicio: Ejercicio | null): string {
+    return ejercicio?.dificultad || 'No especificada';
+  }
+
+  getEquipamiento(ejercicio: Ejercicio | null): string {
+    return ejercicio?.equipamiento || 'No especificado';
   }
 }

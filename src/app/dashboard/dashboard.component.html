@@ -1,0 +1,257 @@
+<div class="dashboard-container">
+  <!-- Header con saludo -->
+  <div class="welcome-section">
+    <h1 class="welcome-title">{{ greeting }}, {{ userName }}! 👋</h1>
+    <p class="date">{{ currentDate | date:'EEEE, d \'de\' MMMM \'del\' y':'es' }}</p>
+  </div>
+
+  <!-- Mensaje de felicitación cuando todo está completado -->
+  <div class="completion-message" *ngIf="stats.completionRate === 100 && stats.totalActivities > 0" [@slideIn]>
+    <h3>🎉 ¡Felicitaciones!</h3>
+    <p>Has completado todas tus actividades del día. ¡Sigue Con Esa Motivacion!</p>
+  </div>
+
+  <!-- Estadísticas rápidas -->
+  <div class="stats-grid" [class.all-completed]="stats.completionRate === 100 && stats.totalActivities > 0">
+    <div class="stat-card">
+      <div class="stat-icon">📋</div>
+      <div class="stat-content">
+        <h3>Actividades Hoy</h3>
+        <p class="stat-number">{{ stats.totalActivities }}</p>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <h3>Completadas</h3>
+        <p class="stat-number">{{ stats.completedToday }}</p>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">🔥</div>
+      <div class="stat-content">
+        <h3>Racha Máxima</h3>
+        <p class="stat-number">{{ stats.currentStreak }} días</p>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <h3>Progreso Hoy</h3>
+        <p class="stat-number">{{ stats.completionRate }}%</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección de actividades -->
+  <div class="activities-section">
+    <div class="section-header">
+      <h2>Mis Actividades de Hoy</h2>
+      <button 
+        class="btn-add" 
+        (click)="showAddActivity = !showAddActivity"
+        type="button"
+        [attr.aria-expanded]="showAddActivity"
+        [attr.aria-label]="showAddActivity ? 'Cerrar formulario de nuevo hábito' : 'Abrir formulario para agregar nuevo hábito'"
+        title="Agregar nuevo hábito"
+      >
+        <span class="btn-icon" aria-hidden="true">➕</span>
+        Nuevo Habito
+      </button>
+    </div>
+
+    <!-- Formulario para agregar actividad -->
+    <div class="add-activity-form" *ngIf="showAddActivity" [@slideIn]>
+      <h3>Agregar Nuevo habito</h3>
+      
+      <div class="form-group">
+        <label for="activity-title">Título *</label>
+        <input 
+          id="activity-title"
+          type="text" 
+          [(ngModel)]="newActivity.title" 
+          placeholder="Ej: Lavarme los dientes"
+          class="form-control"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="activity-description">Descripción (opcional)</label>
+        <textarea 
+          id="activity-description"
+          [(ngModel)]="newActivity.description" 
+          placeholder="Detalles adicionales..."
+          class="form-control"
+          rows="2"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Categoría</label>
+        <div class="category-grid" role="group" aria-label="Seleccionar categoría del hábito">
+          <button 
+            *ngFor="let cat of categories"
+            class="category-btn"
+            type="button"
+            [class.active]="newActivity.category === cat.value"
+            (click)="newActivity.category = cat.value"
+            [style.border-color]="newActivity.category === cat.value ? cat.color : 'transparent'"
+            [attr.aria-label]="'Seleccionar categoría ' + cat.name"
+            [attr.aria-pressed]="newActivity.category === cat.value"
+            [attr.title]="'Categoría: ' + cat.name"
+          >
+            <span class="category-icon" aria-hidden="true">{{ cat.icon }}</span>
+            <span>{{ cat.name }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="activity-frequency">Frecuencia</label>
+        <select 
+          id="activity-frequency" 
+          [(ngModel)]="newActivity.frequency" 
+          class="form-control" 
+          title="Seleccionar frecuencia"
+          aria-label="Seleccionar frecuencia del hábito"
+        >
+          <option value="daily">Diario</option>
+          <option value="weekly">Semanal</option>
+          <option value="monthly">Mensual</option>
+          <option value="custom">Días específicos</option>
+        </select>
+      </div>
+
+      <!-- Selector de días para frecuencia personalizada -->
+      <div class="form-group" *ngIf="newActivity.frequency === 'custom'">
+        <label>Selecciona los días</label>
+        <div class="days-selector" role="group" aria-label="Seleccionar días de la semana">
+          <label 
+            *ngFor="let day of weekDays; let i = index" 
+            class="day-checkbox"
+            [class.selected]="day.selected"
+            [attr.aria-label]="'Seleccionar ' + day.name"
+          >
+            <input 
+              type="checkbox" 
+              [(ngModel)]="day.selected"
+              class="hidden-checkbox"
+              [id]="'day-checkbox-' + i"
+              [attr.title]="'Seleccionar ' + day.name"
+              [attr.aria-label]="'Seleccionar ' + day.name + ' para repetir el hábito'"
+            >
+            <span>{{ day.name.substring(0, 3) }}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Selector de día del mes -->
+      <div class="form-group" *ngIf="newActivity.frequency === 'monthly'">
+        <label for="day-of-month">Día del mes</label>
+        <input 
+          id="day-of-month"
+          type="number" 
+          [(ngModel)]="newActivity.customDayOfMonth" 
+          min="1" 
+          max="31"
+          class="form-control"
+          title="Seleccionar día del mes (1-31)"
+          placeholder="Día (1-31)"
+          aria-label="Día del mes para repetir el hábito"
+        >
+      </div>
+
+      <div class="form-actions">
+        <button 
+          class="btn btn-primary" 
+          (click)="addActivity()"
+          type="button"
+          [disabled]="!newActivity.title.trim()"
+          aria-label="Agregar nueva actividad"
+          title="Agregar nueva actividad a la lista"
+        >
+          Agregar Actividad
+        </button>
+        <button 
+          class="btn btn-secondary" 
+          (click)="resetForm()"
+          type="button"
+          aria-label="Cancelar y cerrar formulario"
+          title="Cancelar la creación del hábito"
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
+
+    <!-- Lista de actividades -->
+    <div class="activities-list">
+      <div 
+        *ngFor="let activity of getActivitiesForToday()" 
+        class="activity-card"
+        [class.completed]="activity.completed"
+        [@fadeIn]
+      >
+        <div class="activity-checkbox">
+          <input 
+            type="checkbox" 
+            [checked]="activity.completed"
+            (change)="toggleActivity(activity)"
+            [id]="'activity-' + activity.id"
+            [attr.title]="'Marcar ' + activity.title + ' como completado'"
+            [attr.aria-label]="'Marcar ' + activity.title + ' como completado'"
+          >
+          <label [for]="'activity-' + activity.id" class="checkbox-label"></label>
+        </div>
+        
+        <div class="activity-content">
+          <div class="activity-header">
+            <h4 [class.strikethrough]="activity.completed">{{ activity.title }}</h4>
+            <span 
+              class="category-badge" 
+              [style.background-color]="getCategoryInfo(activity.category).color"
+            >
+              {{ getCategoryInfo(activity.category).icon }}
+            </span>
+          </div>
+          
+          <p class="activity-description" *ngIf="activity.description">
+            {{ activity.description }}
+          </p>
+          
+          <div class="activity-meta">
+            <span class="frequency-tag">
+              {{ getFrequencyText(activity) }}
+            </span>
+            <span class="streak" *ngIf="activity.streak > 0">
+              🔥 {{ activity.streak }} días
+            </span>
+          </div>
+        </div>
+        
+        <button 
+          class="btn-delete" 
+          (click)="deleteActivity(activity.id)"
+          [attr.aria-label]="'Eliminar ' + activity.title"
+        >
+          🗑️
+        </button>
+      </div>
+
+      <div class="empty-state" *ngIf="getActivitiesForToday().length === 0">
+        <div class="empty-icon">📝</div>
+        <h3>No tienes actividades para hoy</h3>
+        <p>¡Agrega tu primera actividad para comenzar a crear hábitos saludables!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Componente de recomendaciones -->
+  <app-habitos-recomendados 
+    [habitosActuales]="activities" 
+    (agregarHabito)="agregarRecomendacion($event)">
+  </app-habitos-recomendados>
+</div>

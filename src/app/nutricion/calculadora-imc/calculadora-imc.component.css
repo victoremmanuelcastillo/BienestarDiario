@@ -1,0 +1,281 @@
+/* Estilos básicos del contenedor */
+.imc-calculator-container {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    margin-bottom: 30px;
+  }
+  
+  .imc-calculator-container h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-weight: 600;
+    text-align: center;
+  }
+  
+  /* Estilos para el formulario */
+  .imc-form-container {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #34495e;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+  }
+  
+  .form-control:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+  }
+  
+  .btn-calculate {
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-calculate:hover {
+    background-color: #2ecc71;
+  }
+  
+  .btn-calculate:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+  }
+  
+  /* Estilos para el selector de género */
+  .gender-selector {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .gender-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .gender-option input {
+    margin-right: 8px;
+  }
+  
+  /* Estilos para la escala de IMC */
+  .imc-scale {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    padding: 10px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .scale-item {
+    text-align: center;
+    flex: 1;
+    padding: 0 5px;
+    opacity: 0.7;
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  
+  .scale-item.active {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  
+  .scale-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+  }
+  
+  /* Colores específicos para cada categoría de IMC */
+  .scale-item:nth-child(1) .scale-color {
+    background-color: #3498db; /* Bajo peso */
+  }
+  
+  .scale-item:nth-child(2) .scale-color {
+    background-color: #2ecc71; /* Normal */
+  }
+  
+  .scale-item:nth-child(3) .scale-color {
+    background-color: #f39c12; /* Sobrepeso */
+  }
+  
+  .scale-item:nth-child(4) .scale-color {
+    background-color: #e74c3c; /* Obesidad */
+  }
+  
+  .scale-label {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  
+  .scale-range {
+    font-size: 12px;
+    color: #7f8c8d;
+  }
+  
+  /* Estilos para el resultado del IMC */
+  .imc-result-container {
+    margin-top: 25px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .imc-result {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .imc-value {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  
+  .imc-category {
+    font-size: 20px;
+    font-weight: 600;
+  }
+  
+  /* Colores para los resultados */
+  .imc-value.underweight, .imc-category.underweight {
+    color: #3498db;
+  }
+  
+  .imc-value.normal, .imc-category.normal {
+    color: #2ecc71;
+  }
+  
+  .imc-value.overweight, .imc-category.overweight {
+    color: #f39c12;
+  }
+  
+  .imc-value.obese, .imc-category.obese {
+    color: #e74c3c;
+  }
+  
+  /* Estilos para las recomendaciones */
+  .imc-recommendations {
+    margin-top: 20px;
+  }
+  
+  .imc-recommendations h3 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+  }
+  
+  .imc-recommendations ul {
+    padding-left: 20px;
+  }
+  
+  .imc-recommendations li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  
+  /* Estilos para el historial */
+  .imc-history-container {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+  }
+  
+  .history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .history-header h3 {
+    margin: 0;
+    color: #2c3e50;
+  }
+  
+  .btn-clear {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-clear:hover {
+    background-color: #c0392b;
+  }
+  
+  .chart-container {
+    margin-bottom: 20px;
+    height: 300px;
+  }
+  
+  .history-table-container {
+    overflow-x: auto;
+  }
+  
+  .history-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .history-table th, .history-table td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .history-table th {
+    background-color: #f2f2f2;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  
+  .history-table tr:hover {
+    background-color: #f5f5f5;
+  }
+  
+  /* Layout responsivo */
+  .imc-calculator-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+  
+  @media (max-width: 768px) {
+    .imc-calculator-content {
+      grid-template-columns: 1fr;
+    }
+  }

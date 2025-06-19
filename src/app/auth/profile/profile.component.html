@@ -1,116 +1,153 @@
-<!-- src/app/auth/profile/profile.component.html -->
 <div class="profile-container">
-    <div class="container">
-      <div class="profile-header">
-        <h1>Mi Perfil</h1>
-        <p>Gestiona tu información personal y preferencias</p>
-      </div>
-      
-      <div class="profile-content">
-        <div class="profile-sidebar">
-          <div class="profile-avatar">
-            <div class="avatar-placeholder">
-              <span>👤</span>
-            </div>
-            <button class="btn-outline">Cambiar foto</button>
-          </div>
-          
-          <div class="profile-nav">
-            <ul>
-              <li class="active"><a href="#profile-info">Información personal</a></li>
-              <li><a href="#profile-preferences">Preferencias</a></li>
-              <li><a href="#profile-security">Seguridad</a></li>
-            </ul>
+  <div class="container">
+    <div class="profile-header">
+      <h1>Mi Perfil</h1>
+      <p>Gestiona tu información personal</p>
+    </div>
+    
+    <div class="profile-content">
+      <!-- Sidebar con avatar y navegación -->
+      <div class="profile-sidebar">
+        <div class="profile-avatar">
+          <div class="avatar-container" [style.background-image]="profileImage ? 'url(' + profileImage + ')' : 'none'">
+            <span *ngIf="!profileImage">👤</span>
           </div>
         </div>
         
-        <div class="profile-main">
-          <div *ngIf="showSuccessMessage" class="success-message">
-            <p>¡Cambios guardados correctamente!</p>
-          </div>
-          
-          <section id="profile-info" class="profile-section">
-            <h2>Información personal</h2>
-            <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
-              <div class="form-group">
-                <label for="name">Nombre</label>
-                <input type="text" id="name" formControlName="name">
-                <div *ngIf="nameInvalid" class="error-message">
-                  <p>El nombre es obligatorio</p>
-                </div>
-              </div>
-              
-              <div class="form-group">
-                <label for="email">Correo electrónico</label>
-                <input type="email" id="email" formControlName="email">
-                <div *ngIf="emailInvalid" class="error-message">
-                  <p>Ingresa un correo electrónico válido</p>
-                </div>
-              </div>
-              
-              <div class="form-group">
-                <label for="bio">Biografía</label>
-                <textarea id="bio" formControlName="bio" rows="4"></textarea>
-              </div>
-              
-              <div class="form-group">
-                <label for="location">Ubicación</label>
-                <input type="text" id="location" formControlName="location">
-              </div>
-              
-              <button type="submit" class="btn-primary">Guardar cambios</button>
-            </form>
-          </section>
-          
-          <section id="profile-preferences" class="profile-section">
-            <h2>Preferencias</h2>
-            <form [formGroup]="preferencesForm" (ngSubmit)="updatePreferences()">
-              <div class="form-group checkbox-group">
-                <input type="checkbox" id="notifications" formControlName="notifications">
-                <label for="notifications">Recibir notificaciones</label>
-              </div>
-              
-              <div class="form-group checkbox-group">
-                <input type="checkbox" id="darkMode" formControlName="darkMode">
-                <label for="darkMode">Modo oscuro</label>
-              </div>
-              
-              <div class="form-group">
-                <label for="language">Idioma</label>
-                <select id="language" formControlName="language">
-                  <option value="es">Español</option>
-                  <option value="en">Inglés</option>
-                  <option value="fr">Francés</option>
-                  <option value="de">Alemán</option>
-                </select>
-              </div>
-              
-              <button type="submit" class="btn-primary">Guardar preferencias</button>
-            </form>
-          </section>
-          
-          <section id="profile-security" class="profile-section">
-            <h2>Seguridad</h2>
-            <form>
-              <div class="form-group">
-                <label for="current-password">Contraseña actual</label>
-                <input type="password" id="current-password">
-              </div>
-              
-              <div class="form-group">
-                <label for="new-password">Nueva contraseña</label>
-                <input type="password" id="new-password">
-              </div>
-              
-              <div class="form-group">
-                <label for="confirm-password">Confirmar contraseña</label>
-                <input type="password" id="confirm-password">
-              </div>
-              
-              <button type="submit" class="btn-primary">Cambiar contraseña</button>
-            </form>
-          </section>
+        <div class="profile-nav">
+          <ul>
+            <li [class.active]="activeSection === 'profile-info'" (click)="setActiveSection('profile-info')">
+              <i class="fas fa-user"></i>
+              <span>Información personal</span>
+            </li>
+            <li [class.active]="activeSection === 'profile-preferences'" (click)="setActiveSection('profile-preferences')">
+              <i class="fas fa-cog"></i>
+              <span>Preferencias</span>
+            </li>
+            <li [class.active]="activeSection === 'profile-security'" (click)="setActiveSection('profile-security')">
+              <i class="fas fa-lock"></i>
+              <span>Seguridad</span>
+            </li>
+          </ul>
         </div>
+      </div>
+      
+      <!-- Contenido principal -->
+      <div class="profile-main">
+        <!-- Mensajes de éxito y error -->
+        <div *ngIf="showSuccessMessage" class="success-message">
+          <i class="fas fa-check-circle"></i>
+          <p>{{ successMessage }}</p>
+        </div>
+        
+        <div *ngIf="errorMessage" class="error-message">
+          <i class="fas fa-exclamation-circle"></i>
+          <p>{{ errorMessage }}</p>
+        </div>
+        
+        <!-- Sección de información personal -->
+        <section id="profile-info" class="profile-section" [hidden]="activeSection !== 'profile-info'">
+          <h2>Información personal</h2>
+          <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+            <div class="form-group">
+              <label for="name">Nombre</label>
+              <input type="text" id="name" formControlName="name" class="form-control">
+              <div *ngIf="nameInvalid" class="error-message">
+                <p>El nombre es obligatorio</p>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="email">Correo electrónico</label>
+              <input type="email" id="email" formControlName="email" class="form-control">
+              <div *ngIf="emailInvalid" class="error-message">
+                <p>Ingresa un correo electrónico válido</p>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="bio">Biografía</label>
+              <textarea id="bio" formControlName="bio" rows="4" class="form-control"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="location">Ubicación</label>
+              <input type="text" id="location" formControlName="location" class="form-control">
+            </div>
+            
+            <button type="submit" class="btn-primary" [disabled]="isLoading || profileForm.invalid">
+              <i class="fas fa-save"></i>
+              <span *ngIf="isLoading">Guardando...</span>
+              <span *ngIf="!isLoading">Guardar cambios</span>
+            </button>
+          </form>
+        </section>
+        
+        <!-- Sección de preferencias -->
+        <section id="profile-preferences" class="profile-section" [hidden]="activeSection !== 'profile-preferences'">
+          <h2>Preferencias</h2>
+          <form [formGroup]="preferencesForm" (ngSubmit)="updatePreferences()">
+            <div class="form-group toggle-group">
+              <label for="notifications">Recibir notificaciones</label>
+              <div class="toggle-switch">
+                <input type="checkbox" id="notifications" formControlName="notifications">
+                <span class="toggle-slider"></span>
+              </div>
+            </div>           
+            <div class="form-group">
+              <label for="language">Idioma</label>
+              <select id="language" formControlName="language" class="form-control">
+                <option value="es">Español</option>
+                <option value="en">Inglés</option>
+                <option value="fr">Francés</option>
+                <option value="de">Alemán</option>
+              </select>
+            </div>
+            
+            <button type="submit" class="btn-primary" [disabled]="isLoading">
+              <i class="fas fa-save"></i>
+              <span *ngIf="isLoading">Guardando...</span>
+              <span *ngIf="!isLoading">Guardar preferencias</span>
+            </button>
+          </form>
+        </section>
+        
+        <!-- Sección de seguridad -->
+        <section id="profile-security" class="profile-section" [hidden]="activeSection !== 'profile-security'">
+          <h2>Seguridad</h2>
+          <form [formGroup]="passwordForm" (ngSubmit)="updatePassword()">
+            <div class="form-group">
+              <label for="current-password">Contraseña actual</label>
+              <input type="password" id="current-password" formControlName="currentPassword" class="form-control">
+              <div *ngIf="currentPasswordInvalid" class="error-message">
+                <p>La contraseña actual es obligatoria</p>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="new-password">Nueva contraseña</label>
+              <input type="password" id="new-password" formControlName="newPassword" class="form-control">
+              <div *ngIf="newPasswordInvalid" class="error-message">
+                <p>La nueva contraseña debe tener al menos 6 caracteres</p>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="confirm-password">Confirmar contraseña</label>
+              <input type="password" id="confirm-password" formControlName="confirmPassword" class="form-control">
+              <div *ngIf="confirmPasswordInvalid" class="error-message">
+                <p>Las contraseñas no coinciden</p>
+              </div>
+            </div>
+            
+            <button type="submit" class="btn-primary" [disabled]="isLoading || passwordForm.invalid">
+              <i class="fas fa-key"></i>
+              <span *ngIf="isLoading">Actualizando...</span>
+              <span *ngIf="!isLoading">Cambiar contraseña</span>
+            </button>
+          </form>
+        </section>
       </div>
     </div>
   </div>
+</div>

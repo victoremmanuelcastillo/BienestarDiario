@@ -1,0 +1,105 @@
+<div class="chat-container">
+  <!-- Pestañas de chat -->
+  <div class="chat-tabs">
+    <div class="tabs-wrapper">
+      <div 
+        *ngFor="let tab of chatTabs" 
+        class="chat-tab"
+        [class.active]="tab.isActive"
+        (click)="selectTab(tab.id)">
+        
+        <span class="tab-name" 
+              contenteditable="true"
+              (blur)="onTabNameBlur(tab.id, $event)"
+              (keydown.enter)="onTabNameEnter($event)">
+          {{ tab.name }}
+        </span>
+        
+        <button 
+          class="close-tab"
+          (click)="deleteTab(tab.id, $event)"
+          [title]="chatTabs.length === 1 ? 'Limpiar chat' : 'Cerrar pestaña'">
+          {{ chatTabs.length === 1 ? '🗑️' : '✕' }}
+        </button>
+      </div>
+    </div>
+    
+    <button class="new-tab-btn" (click)="createNewChat()" title="Nuevo chat">
+      ➕
+    </button>
+  </div>
+
+  <!-- Área de mensajes -->
+  <div class="chat-messages" #chatMessages>
+    <div class="messages-container">
+      <div *ngIf="activeMessages.length === 0" class="empty-state">
+        <div class="empty-icon">💬</div>
+        <h3>¡Hola! ¿En qué puedo ayudarte?</h3>
+        <p>Escribe tu mensaje abajo para empezar una conversación.</p>
+      </div>
+
+      <div *ngFor="let msg of activeMessages" 
+           class="message"
+           [class.user-message]="msg.role === 'user'"
+           [class.ai-message]="msg.role === 'assistant'">
+        
+        <div class="message-avatar">
+          <span *ngIf="msg.role === 'user'">👤</span>
+          <span *ngIf="msg.role === 'assistant'">🤖</span>
+        </div>
+        
+        <div class="message-content">
+          <div class="message-header">
+            <span class="message-sender">
+              {{ msg.role === 'user' ? 'Tú' : 'IA' }}
+            </span>
+            <span class="message-time">
+              {{ formatTime(msg.timestamp) }}
+            </span>
+          </div>
+          <div class="message-text" [innerHTML]="formatMessage(msg.content)"></div>
+        </div>
+      </div>
+
+      <!-- Indicador de carga -->
+      <div *ngIf="isLoading" class="message ai-message loading-message">
+        <div class="message-avatar">
+          <span>🤖</span>
+        </div>
+        <div class="message-content">
+          <div class="message-header">
+            <span class="message-sender">IA</span>
+          </div>
+          <div class="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Área de entrada -->
+  <div class="chat-input-area">
+    <div class="input-container">
+      <textarea 
+        [(ngModel)]="userMessage" 
+        placeholder="Escribe tu mensaje aquí... (Enter para enviar, Shift+Enter para nueva línea)"
+        class="message-input"
+        rows="1"
+        (keydown)="onKeyPress($event)"
+        [disabled]="isLoading">
+      </textarea>
+      
+      <button 
+        class="send-button"
+        (click)="sendMessage()"
+        [disabled]="!userMessage.trim() || isLoading"
+        [title]="isLoading ? 'Enviando...' : 'Enviar mensaje'">
+        <span *ngIf="!isLoading">🚀</span>
+        <span *ngIf="isLoading" class="loading-spinner">⏳</span>
+      </button>
+    </div>
+  </div>
+</div>

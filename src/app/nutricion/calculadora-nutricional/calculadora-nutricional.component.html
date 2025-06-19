@@ -1,0 +1,254 @@
+<!-- calculadora-nutricional.component.html corregido -->
+<div class="nutrition-calculator">
+  <div class="calculator-header">
+    <h2>Calculadora Nutricional</h2>
+    <p>Registra tu consumo diario de alimentos y monitorea tus nutrientes.</p>
+  </div>
+  
+  <div class="date-selector">
+    <button (click)="previousDay()" class="date-nav-btn" aria-label="Día anterior" title="Día anterior">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <div class="current-date">
+      <span>{{ selectedDate | date:'EEEE, d MMMM yyyy':'':'es' }}</span>
+      <button (click)="today()" class="today-btn">Hoy</button>
+    </div>
+    <button (click)="nextDay()" class="date-nav-btn" aria-label="Día siguiente" title="Día siguiente">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+  
+  <div class="meal-selector">
+    <div class="meal-type-tabs">
+      <div 
+        class="meal-tab" 
+        [class.active]="selectedMealType === 'breakfast'"
+        (click)="selectMealType('breakfast')"
+      >
+        Desayuno
+      </div>
+      <div 
+        class="meal-tab" 
+        [class.active]="selectedMealType === 'lunch'"
+        (click)="selectMealType('lunch')"
+      >
+        Almuerzo
+      </div>
+      <div 
+        class="meal-tab" 
+        [class.active]="selectedMealType === 'dinner'"
+        (click)="selectMealType('dinner')"
+      >
+        Cena
+      </div>
+      <div 
+        class="meal-tab" 
+        [class.active]="selectedMealType === 'snack'"
+        (click)="selectMealType('snack')"
+      >
+        Snacks
+      </div>
+    </div>
+  </div>
+  
+  <!-- Mostrar el componente de emergencia si hay un error de API o si el usuario lo activa manualmente -->
+  <div *ngIf="showEmergencyCalculator">
+    <app-calculadora-nutricional-emergencia
+      [selectedMealType]="selectedMealType"
+      (addFood)="handleAddFoodFromEmergency($event)"
+    ></app-calculadora-nutricional-emergencia>
+  </div>
+  
+  <!-- Formulario de búsqueda normal (se oculta si se muestra el componente de emergencia) -->
+  <div *ngIf="!showEmergencyCalculator" class="food-search">
+    <form [formGroup]="nutritionForm" (ngSubmit)="getNutritionInfo()">
+      <div class="search-container">
+        <input 
+          type="text" 
+          formControlName="ingredient" 
+          placeholder="Buscar alimento (ej: 1 manzana, 100g de pollo)" 
+          class="search-input"
+        >
+        <button type="submit" class="search-btn" [disabled]="isLoadingNutrition">
+          <span *ngIf="!isLoadingNutrition">Buscar</span>
+          <span *ngIf="isLoadingNutrition">Buscando...</span>
+        </button>
+      </div>
+    </form>
+    
+    <!-- Botón para mostrar manualmente la calculadora de emergencia -->
+    <button class="emergency-btn" (click)="toggleEmergencyCalculator()">
+      Usar calculadora offline
+    </button>
+    
+    <div *ngIf="nutritionInfo && nutritionInfo.foods && nutritionInfo.foods.length > 0" class="nutrition-result">
+      <div class="food-header">
+        <h3>{{ nutritionInfo.foods[0].food_name }}</h3>
+        <div class="serving-info">
+          {{ nutritionInfo.foods[0].serving_qty }} {{ nutritionInfo.foods[0].serving_unit }}
+          ({{ nutritionInfo.foods[0].serving_weight_grams }}g)
+        </div>
+      </div>
+      
+      <div class="nutrition-details">
+        <div *ngFor="let nutrient of getNutritionDetails()" class="nutrient-row">
+          <span>{{ nutrient.label }}</span>
+          <span>{{ nutrient.quantity | number:'1.0-1' }} {{ nutrient.unit }}</span>
+        </div>
+      </div>
+      
+      <div class="action-buttons">
+        <button class="add-food-btn" (click)="addFoodEntry()">
+          Añadir a {{ getMealTypeLabel() }}
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Comidas con información nutricional junto a cada una -->
+  <div class="meal-entries">
+    <div *ngFor="let mealType of mealTypes">
+      <div class="meal-section">
+        <h3>
+          {{ getMealTypeTranslation(mealType) }}
+        </h3>
+        
+        <!-- Información de nutrición junto a cada comida -->
+        <div *ngIf="(dailyEntries | filterByMealType:mealType).length > 0" class="meal-nutrition-summary">
+          <div class="goal-progress">
+            <div class="goal-label">
+              <span>Calorías</span>
+              <span>{{ calculateMealTypeTotal(mealType, 'calories') | number:'1.0-0' }} kcal</span>
+            </div>
+          </div>
+          
+          <div class="goal-progress">
+            <div class="goal-label">
+              <span>Proteínas</span>
+              <span>{{ calculateMealTypeTotal(mealType, 'protein') | number:'1.0-0' }}g</span>
+            </div>
+          </div>
+          
+          <div class="goal-progress">
+            <div class="goal-label">
+              <span>Carbohidratos</span>
+              <span>{{ calculateMealTypeTotal(mealType, 'carbs') | number:'1.0-0' }}g</span>
+            </div>
+          </div>
+          
+          <div class="goal-progress">
+            <div class="goal-label">
+              <span>Grasas</span>
+              <span>{{ calculateMealTypeTotal(mealType, 'fat') | number:'1.0-0' }}g</span>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="(dailyEntries | filterByMealType:mealType).length === 0" class="no-entries">
+          No hay alimentos registrados
+        </div>
+        
+        <div *ngFor="let entry of dailyEntries | filterByMealType:mealType" class="food-entry">
+          <div class="entry-details">
+            <div class="entry-name">{{ entry.food_name }}</div>
+            <div class="entry-serving">
+              {{ entry.serving_qty }} {{ entry.serving_unit }}
+              ({{ entry.serving_weight_grams }}g)
+            </div>
+            <div class="entry-calories">{{ entry.calories | number:'1.0-0' }} kcal</div>
+          </div>
+          <button class="remove-entry-btn" (click)="removeFoodEntry(entry.id)" aria-label="Eliminar alimento" title="Eliminar alimento">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Resumen total diario -->
+  <div class="nutrition-goals">
+    <h3>Resumen diario</h3>
+    <div class="goal-progress">
+      <div class="goal-label">
+        <span>Calorías</span>
+        <span>{{ dailyTotals.calories | number:'1.0-0' }} / {{ calorieGoal }}</span>
+      </div>
+      <div class="progress-bar">
+        <div 
+          class="progress-fill" 
+          [style.width.%]="getGoalPercentage('calories') > 100 ? 100 : getGoalPercentage('calories')"
+          [class.over-goal]="isOverGoal('calories')"
+        ></div>
+      </div>
+    </div>
+    
+    <div class="goal-progress">
+      <div class="goal-label">
+        <span>Proteínas</span>
+        <span>{{ dailyTotals.protein | number:'1.0-0' }}g / {{ proteinGoal }}g</span>
+      </div>
+      <div class="progress-bar">
+        <div 
+          class="progress-fill" 
+          [style.width.%]="getGoalPercentage('protein') > 100 ? 100 : getGoalPercentage('protein')"
+          [class.over-goal]="isOverGoal('protein')"
+        ></div>
+      </div>
+    </div>
+    
+    <div class="goal-progress">
+      <div class="goal-label">
+        <span>Carbohidratos</span>
+        <span>{{ dailyTotals.carbs | number:'1.0-0' }}g / {{ carbsGoal }}g</span>
+      </div>
+      <div class="progress-bar">
+        <div 
+          class="progress-fill" 
+          [style.width.%]="getGoalPercentage('carbs') > 100 ? 100 : getGoalPercentage('carbs')"
+          [class.over-goal]="isOverGoal('carbs')"
+        ></div>
+      </div>
+    </div>
+    
+    <div class="goal-progress">
+      <div class="goal-label">
+        <span>Grasas</span>
+        <span>{{ dailyTotals.fat | number:'1.0-0' }}g / {{ fatGoal }}g</span>
+      </div>
+      <div class="progress-bar">
+        <div 
+          class="progress-fill" 
+          [style.width.%]="getGoalPercentage('fat') > 100 ? 100 : getGoalPercentage('fat')"
+          [class.over-goal]="isOverGoal('fat')"
+        ></div>
+      </div>
+    </div>
+    
+    <div class="goal-progress">
+      <div class="goal-label">
+        <span>Fibra</span>
+        <span>{{ dailyTotals.fiber | number:'1.0-0' }}g / {{ fiberGoal }}g</span>
+      </div>
+      <div class="progress-bar">
+        <div 
+          class="progress-fill" 
+          [style.width.%]="getGoalPercentage('fiber') > 100 ? 100 : getGoalPercentage('fiber')"
+          [class.over-goal]="isOverGoal('fiber')"
+        ></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Gráficas al final -->
+  <div class="charts-container">
+    <div class="chart-box">
+      <h4>Distribución de calorías por comida</h4>
+      <canvas id="calorieChart"></canvas>
+    </div>
+    
+    <div class="chart-box">
+      <h4>Distribución de macronutrientes</h4>
+      <canvas id="macroChart"></canvas>
+    </div>
+  </div>
+</div>

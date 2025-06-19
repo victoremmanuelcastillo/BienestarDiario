@@ -1,0 +1,149 @@
+<!-- calculadora-imc.component.html -->
+<div class="imc-calculator-container">
+    <h2>Calculadora de Índice de Masa Corporal (IMC)</h2>
+    
+    <div class="imc-calculator-content">
+      <div class="imc-form-container">
+        <form (ngSubmit)="calculateIMC()" #imcForm="ngForm">
+          <div class="form-group">
+            <label for="weight">Peso (kg)</label>
+            <input 
+              type="number" 
+              id="weight" 
+              name="weight" 
+              [(ngModel)]="weight" 
+              required 
+              min="30" 
+              max="300" 
+              step="0.1"
+              class="form-control"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="height">Altura (cm)</label>
+            <input 
+              type="number" 
+              id="height" 
+              name="height" 
+              [(ngModel)]="height" 
+              required 
+              min="100" 
+              max="250" 
+              step="0.1"
+              class="form-control"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="age">Edad</label>
+            <input 
+              type="number" 
+              id="age" 
+              name="age" 
+              [(ngModel)]="age" 
+              required 
+              min="18" 
+              max="120"
+              class="form-control"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label>Género</label>
+            <div class="gender-selector">
+              <label class="gender-option">
+                <input type="radio" name="gender" [(ngModel)]="gender" value="male">
+                <span>Masculino</span>
+              </label>
+              <label class="gender-option">
+                <input type="radio" name="gender" [(ngModel)]="gender" value="female">
+                <span>Femenino</span>
+              </label>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn-calculate" [disabled]="!imcForm.valid">
+            Calcular IMC
+          </button>
+        </form>
+      </div>
+      
+      <div class="imc-result-container" *ngIf="imcResult > 0">
+        <div class="imc-result">
+          <div class="imc-value" [class]="imcCategoryClass">
+            {{ imcResult | number:'1.1-1' }}
+          </div>
+          <div class="imc-category" [class]="imcCategoryClass">
+            {{ imcCategory }}
+          </div>
+        </div>
+        
+        <div class="imc-scale">
+          <div class="scale-item" [class.active]="imcResult < 18.5">
+            <div class="scale-color"></div>
+            <div class="scale-label">Bajo peso</div>
+            <div class="scale-range">&lt; 18.5</div>
+          </div>
+          <div class="scale-item" [class.active]="imcResult >= 18.5 && imcResult < 25">
+            <div class="scale-color"></div>
+            <div class="scale-label">Normal</div>
+            <div class="scale-range">18.5 - 24.9</div>
+          </div>
+          <div class="scale-item" [class.active]="imcResult >= 25 && imcResult < 30">
+            <div class="scale-color"></div>
+            <div class="scale-label">Sobrepeso</div>
+            <div class="scale-range">25 - 29.9</div>
+          </div>
+          <div class="scale-item" [class.active]="imcResult >= 30">
+            <div class="scale-color"></div>
+            <div class="scale-label">Obesidad</div>
+            <div class="scale-range">&gt;= 30</div>
+          </div>
+        </div>
+        
+        <div class="imc-recommendations">
+          <h3>Recomendaciones</h3>
+          <ul>
+            <li *ngFor="let recommendation of getRecommendations()">
+              {{ recommendation }}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <div class="imc-history-container" *ngIf="imcHistory.length > 0">
+      <div class="history-header">
+        <h3>Historial de IMC</h3>
+        <button class="btn-clear" (click)="clearHistory()">Borrar historial</button>
+      </div>
+      
+      <div class="chart-container">
+        <canvas id="imcChart"></canvas>
+      </div>
+      
+      <div class="history-table-container" *ngIf="imcHistory.length > 0">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Peso (kg)</th>
+              <th>Altura (cm)</th>
+              <th>IMC</th>
+              <th>Categoría</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let record of imcHistory.slice().reverse().slice(0, 5)">
+              <td>{{ record.date | date:'dd/MM/yyyy' }}</td>
+              <td>{{ record.weight }}</td>
+              <td>{{ record.height }}</td>
+              <td>{{ record.imc | number:'1.1-1' }}</td>
+              <td>{{ record.category }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>

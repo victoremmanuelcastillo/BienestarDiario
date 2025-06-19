@@ -1,0 +1,37 @@
+<!-- habitos-recomendados.component.html -->
+<div class="recomendaciones-container">
+  <h3>Recomendaciones de hábitos saludables</h3>
+  
+  <div class="recomendaciones-list">
+    <div *ngIf="recomendacionesFiltradas.length === 0" class="empty-state">
+      <p>¡Genial! Ya has agregado todas nuestras recomendaciones.</p>
+    </div>
+    
+    <div *ngFor="let recomendacion of recomendacionesFiltradas" class="recomendacion-card">
+      <div class="recomendacion-content">
+        <div class="recomendacion-header">
+          <span class="category-badge" [style.background-color]="getCategoryInfo(recomendacion.category).color">
+            {{ getCategoryInfo(recomendacion.category).icon }}
+          </span>
+          <h4>{{ recomendacion.title }}</h4>
+        </div>
+        
+        <p class="recomendacion-description">
+          {{ recomendacion.description }}
+        </p>
+        
+        <div class="recomendacion-meta">
+          <span class="frequency-tag">
+            {{ recomendacion.frequency === 'daily' ? 'Diario' : 
+               recomendacion.frequency === 'weekly' ? 'Semanal' : 
+               recomendacion.frequency === 'monthly' ? 'Mensual' : 'Personalizado' }}
+          </span>
+        </div>
+      </div>
+      
+      <button class="btn-add-recomendacion" (click)="agregarRecomendacion(recomendacion)">
+        Agregar a mis hábitos
+      </button>
+    </div>
+  </div>
+</div>

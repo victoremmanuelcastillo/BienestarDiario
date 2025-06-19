@@ -1,0 +1,77 @@
+<!-- graficas-habitos.component.html -->
+<div class="graficas-container">
+    <h2>Análisis de Hábitos</h2>
+    
+    <div class="filters">
+      <div class="filter-group">
+        <label for="view-select">Vista:</label>
+        <select id="view-select" [(ngModel)]="selectedView" (change)="onViewChange()">
+          <option value="daily">Diaria</option>
+          <option value="monthly">Mensual</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="category-select">Categoría:</label>
+        <select id="category-select" [(ngModel)]="selectedCategory" (change)="onCategoryChange()">
+          <option *ngFor="let cat of categories" [value]="cat.value">
+            {{ cat.icon }} {{ cat.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="chart-container" [class.active]="selectedView === 'daily'">
+      <h3>Progreso Diario</h3>
+      <p class="chart-description">Hábitos completados en los últimos 7 días</p>
+      <div class="chart-wrapper">
+        <canvas id="dailyHabitsChart"></canvas>
+      </div>
+    </div>
+    
+    <div class="chart-container" [class.active]="selectedView === 'monthly'">
+      <h3>Progreso Mensual</h3>
+      <p class="chart-description">Hábitos completados en los últimos 6 meses</p>
+      <div class="chart-wrapper">
+        <canvas id="monthlyHabitsChart"></canvas>
+      </div>
+    </div>
+    
+    <div class="stats-summary">
+      <h3>Resumen de Estadísticas</h3>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-content">
+            <h4>Total de Hábitos</h4>
+            <p class="stat-number">{{ activities.length }}</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <h4>Completados (Último Mes)</h4>
+            <p class="stat-number">{{ getCompletedLastMonth() }}</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">🔥</div>
+          <div class="stat-content">
+            <h4>Racha Máxima</h4>
+            <p class="stat-number">{{ getMaxStreak() }} días</p>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-content">
+            <h4>Categoría Más Activa</h4>
+            <p class="stat-number">{{ getMostActiveCategory() }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
