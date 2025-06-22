@@ -1,5 +1,6 @@
-<!-- dashboard.component.html - Template corregido -->
+<!-- dashboard.component.html - Template simplificado -->
 <div class="dashboard-container">
+  
   <!-- Header con saludo -->
   <div class="welcome-section">
     <h1 class="welcome-title">{{ greeting }}, {{ userName }}! 👋</h1>
@@ -7,25 +8,25 @@
   </div>
 
   <!-- Mensaje de felicitación cuando todo está completado -->
-  <div class="completion-message" *ngIf="stats.completionRate === 100 && stats.totalActivities > 0" [@slideIn]>
+  <div class="completion-message" *ngIf="stats.completionRate === 100 && stats.totalHabits > 0" [@slideIn]>
     <h3>🎉 ¡Felicitaciones!</h3>
-    <p>Has completado todas tus actividades del día. ¡Sigue Con Esa Motivación!</p>
+    <p>Has completado todos tus hábitos del día. ¡Sigue Con Esa Motivación!</p>
   </div>
 
   <!-- Estadísticas rápidas -->
-  <div class="stats-grid" [class.all-completed]="stats.completionRate === 100 && stats.totalActivities > 0">
+  <div class="stats-grid" [class.all-completed]="stats.completionRate === 100 && stats.totalHabits > 0">
     <div class="stat-card">
-      <div class="stat-icon">📋</div>
+      <div class="stat-icon">🎯</div>
       <div class="stat-content">
-        <h3>Actividades Hoy</h3>
-        <p class="stat-number">{{ stats.totalActivities }}</p>
+        <h3>Hábitos Activos</h3>
+        <p class="stat-number">{{ stats.totalHabits }}</p>
       </div>
     </div>
     
     <div class="stat-card">
       <div class="stat-icon">✅</div>
       <div class="stat-content">
-        <h3>Completadas</h3>
+        <h3>Completados Hoy</h3>
         <p class="stat-number">{{ stats.completedToday }}</p>
       </div>
     </div>
@@ -47,453 +48,82 @@
     </div>
   </div>
 
-  <!-- Botón para agregar nueva actividad - MOVIDO ARRIBA -->
-  <div class="add-activity-section">
+  <!-- Navegación rápida -->
+  <div class="quick-navigation">
     <button 
-      class="btn-add-main" 
-      (click)="showAddActivity = !showAddActivity"
-      type="button"
-      [attr.aria-expanded]="showAddActivity"
-      [attr.aria-label]="showAddActivity ? 'Cerrar formulario' : 'Agregar nueva actividad'">
-      <span class="add-icon">{{ showAddActivity ? '➖' : '➕' }}</span>
-      <span>{{ showAddActivity ? 'Cerrar' : 'Agregar Nueva Actividad' }}</span>
+      class="nav-button" 
+      [class.active]="!showHabitsManager"
+      (click)="showHabitsManager = false">
+      <span class="nav-icon">🏠</span>
+      <span>Dashboard</span>
+    </button>
+    
+    <button 
+      class="nav-button" 
+      [class.active]="showHabitsManager"
+      (click)="toggleHabitsManager()">
+      <span class="nav-icon">🎯</span>
+      <span>Gestionar Hábitos</span>
     </button>
   </div>
 
-  <!-- Formulario para agregar nueva actividad -->
-  <div class="add-activity-form" *ngIf="showAddActivity" [@slideIn]>
-    <h3>✨ Crear Nuevo Hábito</h3>
+  <!-- Vista del Dashboard Principal -->
+  <div class="dashboard-main" *ngIf="!showHabitsManager">
     
-    <div class="form-group">
-      <label for="activity-title">Título del hábito *:</label>
-      <input 
-        type="text" 
-        id="activity-title"
-        [(ngModel)]="newActivity.title" 
-        placeholder="Ej: Lavarme los dientes"
-        class="form-input"
-        required>
-    </div>
-
-    <div class="form-group">
-      <label for="activity-description">Descripción (opcional):</label>
-      <textarea 
-        id="activity-description"
-        [(ngModel)]="newActivity.description" 
-        placeholder="Describe tu hábito para mantenerte motivado..."
-        class="form-textarea"></textarea>
-    </div>
-
-    <div class="form-group">
-      <label for="activity-category">Categoría:</label>
-      <select id="activity-category" [(ngModel)]="newActivity.category" class="form-select">
-        <option *ngFor="let cat of categories" [value]="cat.value">
-          {{ cat.icon }} {{ cat.name }}
-        </option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="activity-frequency">Frecuencia:</label>
-      <select id="activity-frequency" [(ngModel)]="newActivity.frequency" class="form-select">
-        <option value="daily">Diario</option>
-        <option value="weekly">Semanal</option>
-        <option value="monthly">Mensual</option>
-        <option value="custom">Personalizado</option>
-      </select>
-    </div>
-
-    <!-- Sección de horarios múltiples - SIMPLIFICADA -->
-    <div class="form-group">
-      <div class="schedules-header">
-        <label>⏰ Horarios y Recordatorios:</label>
-        <button type="button" class="btn-add-schedule" (click)="addScheduleToForm()">
-          ➕ Agregar horario
+    <!-- Resumen de hábitos del día (usando el componente pero en modo compacto) -->
+    <div class="habits-summary-section">
+      <h2 class="section-title">📋 Tus Hábitos de Hoy</h2>
+      <app-habits-manager
+        [showAddButton]="false"
+        [compactMode]="true"
+        [maxHabitsToShow]="6"
+        (statsChanged)="onHabitsStatsChanged($event)"
+        (habitCompleted)="onHabitCompleted($event)">
+      </app-habits-manager>
+      
+      <div class="view-all-section">
+        <button class="btn-view-all" (click)="toggleHabitsManager()">
+          Ver y Gestionar Todos los Hábitos →
         </button>
       </div>
-      
-      <div class="schedules-simple" *ngIf="newActivity.schedules.length > 0">
-        <div class="schedule-simple-card" *ngFor="let schedule of newActivity.schedules; let i = index">
-          
-          <!-- Opción: Hora específica O período general -->
-          <div class="schedule-type-selector">
-            <div class="radio-group">
-              <label class="radio-option">
-                <input type="radio" 
-                       [name]="'schedule-type-' + i" 
-                       value="time"
-                       [checked]="schedule.time && schedule.time !== ''"
-                       (change)="setScheduleType(schedule, 'time')">
-                <span>🕐 Hora específica</span>
-              </label>
-              
-              <label class="radio-option">
-                <input type="radio" 
-                       [name]="'schedule-type-' + i" 
-                       value="period"
-                       [checked]="!schedule.time || schedule.time === ''"
-                       (change)="setScheduleType(schedule, 'period')">
-                <span>📅 Período del día</span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Selector de hora específica -->
-          <div class="time-selector" *ngIf="schedule.time && schedule.time !== ''">
-            <label>Hora:</label>
-            <input 
-              type="time" 
-              [(ngModel)]="schedule.time"
-              (ngModelChange)="updateScheduleTimeOfDay(schedule, schedule.time)"
-              class="time-input-simple">
-            <small class="auto-period">
-              Período: {{ getTimeOfDayText(schedule.timeOfDay) }}
-            </small>
-          </div>
-
-          <!-- Selector de período -->
-          <div class="period-selector" *ngIf="!schedule.time || schedule.time === ''">
-            <label>Período:</label>
-            <select [(ngModel)]="schedule.timeOfDay" class="period-select-simple">
-              <option value="morning">🌅 Mañana (06:00-12:00)</option>
-              <option value="afternoon">☀️ Tarde (12:01-18:00)</option>
-              <option value="evening">🌙 Noche (18:01-23:59)</option>
-            </select>
-          </div>
-
-          <!-- Solo notificaciones -->
-          <div class="schedule-options-simple">
-            <label class="switch-simple">
-              <input type="checkbox" [(ngModel)]="schedule.notificationEnabled">
-              <span class="slider-simple"></span>
-              <span class="option-text">🔔 Recibir notificaciones</span>
-            </label>
-          </div>
-          
-          <button type="button" class="btn-remove-simple" (click)="removeScheduleFromForm(i)">
-            🗑️ Eliminar
-          </button>
-        </div>
-      </div>
-      
-      <div class="schedules-help-simple">
-        <p><strong>💡 Puedes elegir:</strong></p>
-        <div class="help-options">
-          <div class="help-option">
-            <strong>🕐 Hora específica:</strong> Para hábitos que necesitas hacer a una hora exacta (ej: 8:00 AM)
-          </div>
-          <div class="help-option">
-            <strong>📅 Período del día:</strong> Para hábitos flexibles que puedes hacer en cualquier momento del período
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- Días personalizados para frecuencia semanal -->
-    <div class="form-group" *ngIf="newActivity.frequency === 'custom'">
-      <label>Días de la semana:</label>
-      <div class="days-selector">
-        <label *ngFor="let day of weekDays" class="day-checkbox">
-          <input 
-            type="checkbox" 
-            [value]="day.value"
-            [checked]="newActivity.customDays.includes(day.value)"
-            (change)="toggleCustomDay($event, day.value)">
-          <span>{{ day.name.substring(0, 3) }}</span>
-        </label>
-      </div>
+    <!-- Sección de motivación -->
+    <div class="motivation-section" *ngIf="shouldShowMotivation()">
+      <h2 class="section-title">💪 Motivación del Día</h2>
+      <app-motivacion 
+        [completionRate]="stats.completionRate"
+        [currentStreak]="stats.currentStreak" 
+        [totalActivities]="stats.totalHabits">
+      </app-motivacion>
     </div>
 
-    <!-- Día del mes para frecuencia mensual -->
-    <div class="form-group" *ngIf="newActivity.frequency === 'monthly'">
-      <label for="custom-day">Día del mes (1-31):</label>
-      <input 
-        type="number" 
-        id="custom-day"
-        [(ngModel)]="newActivity.customDayOfMonth" 
-        min="1" 
-        max="31" 
-        class="form-input">
-    </div>
-
-    <div class="form-actions">
-      <button 
-        type="button" 
-        class="btn-create" 
-        (click)="addActivity()"
-        [disabled]="!newActivity.title.trim()">
-        <span class="btn-icon">✨</span>
-        <span>Crear Hábito</span>
-      </button>
-      
-      <button 
-        type="button" 
-        class="btn-cancel" 
-        (click)="showAddActivity = false; resetForm()">
-        <span class="btn-icon">❌</span>
-        <span>Cancelar</span>
-      </button>
+    <!-- Hábitos recomendados -->
+    <div class="recommendations-section">
+      <h2 class="section-title">💡 Hábitos Recomendados</h2>
+      <app-habitos-recomendados 
+        [habitosActuales]="[]"
+        (agregarHabito)="onRecommendedHabitAdded($event)">
+      </app-habitos-recomendados>
     </div>
   </div>
 
-  <!-- Actividades organizadas por horario -->
-  <div class="activities-by-time">
-    <div class="time-period-container" *ngFor="let period of timeOfDayPeriods" 
-         [class.current-period]="getCurrentTimeOfDay() === period.value">
-      
-      <div class="time-period-header">
-        <div class="period-info">
-          <span class="period-icon">{{ period.icon }}</span>
-          <h2>{{ period.name }}</h2>
-          <span class="time-range">{{ period.timeRange }}</span>
-        </div>
-        <div class="period-stats">
-          <span class="activities-count">
-            {{ getActivitiesByTimeOfDay(period.value).length }} actividades
-          </span>
-        </div>
-      </div>
-
-      <div class="activities-list" *ngIf="getActivitiesByTimeOfDay(period.value).length > 0">
-        <div class="activity-card" 
-             *ngFor="let activity of getActivitiesByTimeOfDay(period.value); trackBy: trackByActivityId"
-             [class.completed]="activity.completed"
-             [class.editing]="activity.isEditing"
-             [@fadeIn]>
-          
-          <!-- Vista normal de la actividad - UN SOLO BOTÓN -->
-          <div class="activity-content" *ngIf="!activity.isEditing">
-            <!-- Botón único de completado -->
-            <div class="activity-complete-left">
-              <button 
-                class="btn-complete-unified" 
-                [class.completed]="isActivityCompletedToday(activity)"
-                (click)="toggleActivityToday(activity)"
-                [attr.aria-label]="isActivityCompletedToday(activity) ? 'Marcar como pendiente' : 'Marcar como completado'">
-                <span class="complete-icon">{{ isActivityCompletedToday(activity) ? '✅' : '⭕' }}</span>
-                <span class="complete-text">{{ isActivityCompletedToday(activity) ? 'Hecho' : 'Hacer' }}</span>
-              </button>
-            </div>
-
-            <div class="activity-main">
-              <div class="activity-header">
-                <div class="activity-title-section">
-                  <span class="category-icon" [style.color]="getCategoryInfo(activity.category).color">
-                    {{ getCategoryInfo(activity.category).icon }}
-                  </span>
-                  <div class="activity-info">
-                    <h3 class="activity-title">{{ activity.title }}</h3>
-                    <p class="activity-description" *ngIf="activity.description">{{ activity.description }}</p>
-                  </div>
-                </div>
-                
-                <div class="activity-actions">
-                  <button class="btn-icon edit" (click)="startEditActivity(activity)" title="Editar">
-                    ✏️
-                  </button>
-                  <button class="btn-icon delete" (click)="deleteActivity(activity)" title="Eliminar">
-                    🗑️
-                  </button>
-                </div>
-              </div>
-
-              <div class="activity-schedules">
-                <div class="schedule-item" 
-                     *ngFor="let schedule of getActiveSchedulesForPeriod(activity, period.value)"
-                     [class.current-schedule]="true"
-                     [class.completed]="isActivityCompletedToday(activity)">
-                  <span class="schedule-time">{{ schedule.time || getPeriodDisplayName(schedule.timeOfDay) }}</span>
-                  <span class="notification-status" *ngIf="schedule.notificationEnabled">🔔</span>
-                  <span class="completion-status" *ngIf="isActivityCompletedToday(activity)">✅</span>
-                </div>
-              </div>
-
-              <div class="activity-meta">
-                <span class="frequency">{{ getFrequencyText(activity) }}</span>
-                <span class="category">{{ getCategoryInfo(activity.category).name }}</span>
-                <span class="streak" *ngIf="activity.streak > 0">🔥 {{ activity.streak }} días</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Formulario de edición -->
-          <div class="edit-form" *ngIf="activity.isEditing">
-            <div class="form-group">
-              <label for="edit-title">Título del hábito:</label>
-              <input 
-                type="text" 
-                id="edit-title"
-                [(ngModel)]="editForm.title" 
-                placeholder="Ej: Lavarme los dientes"
-                class="form-input">
-            </div>
-
-            <div class="form-group">
-              <label for="edit-description">Descripción (opcional):</label>
-              <textarea 
-                id="edit-description"
-                [(ngModel)]="editForm.description" 
-                placeholder="Describe tu hábito..."
-                class="form-textarea"></textarea>
-            </div>
-
-            <div class="form-group">
-              <label for="edit-category">Categoría:</label>
-              <select id="edit-category" [(ngModel)]="editForm.category" class="form-select">
-                <option *ngFor="let cat of categories" [value]="cat.value">
-                  {{ cat.icon }} {{ cat.name }}
-                </option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="edit-frequency">Frecuencia:</label>
-              <select id="edit-frequency" [(ngModel)]="editForm.frequency" class="form-select">
-                <option value="daily">Diario</option>
-                <option value="weekly">Semanal</option>
-                <option value="monthly">Mensual</option>
-                <option value="custom">Personalizado</option>
-              </select>
-            </div>
-
-            <!-- Horarios múltiples - SIMPLIFICADOS -->
-            <div class="form-group">
-              <div class="schedules-header">
-                <label>Horarios del día:</label>
-                <button type="button" class="btn-add-schedule" (click)="addScheduleToEditForm()">
-                  ➕ Agregar horario
-                </button>
-              </div>
-              
-              <div class="schedules-simple" *ngIf="editForm.schedules.length > 0">
-                <div class="schedule-simple-card" *ngFor="let schedule of editForm.schedules; let i = index">
-                  
-                  <!-- Opción: Hora específica O período general -->
-                  <div class="schedule-type-selector">
-                    <div class="radio-group">
-                      <label class="radio-option">
-                        <input type="radio" 
-                               [name]="'edit-schedule-type-' + i" 
-                               value="time"
-                               [checked]="schedule.time && schedule.time !== ''"
-                               (change)="setEditScheduleType(schedule, 'time')">
-                        <span>🕐 Hora específica</span>
-                      </label>
-                      
-                      <label class="radio-option">
-                        <input type="radio" 
-                               [name]="'edit-schedule-type-' + i" 
-                               value="period"
-                               [checked]="!schedule.time || schedule.time === ''"
-                               (change)="setEditScheduleType(schedule, 'period')">
-                        <span>📅 Período del día</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <!-- Selector de hora específica -->
-                  <div class="time-selector" *ngIf="schedule.time && schedule.time !== ''">
-                    <label>Hora:</label>
-                    <input 
-                      type="time" 
-                      [(ngModel)]="schedule.time"
-                      (ngModelChange)="updateScheduleTimeOfDay(schedule, schedule.time)"
-                      class="time-input-simple">
-                    <small class="auto-period">
-                      Período: {{ getTimeOfDayText(schedule.timeOfDay) }}
-                    </small>
-                  </div>
-
-                  <!-- Selector de período -->
-                  <div class="period-selector" *ngIf="!schedule.time || schedule.time === ''">
-                    <label>Período:</label>
-                    <select [(ngModel)]="schedule.timeOfDay" class="period-select-simple">
-                      <option value="morning">🌅 Mañana (06:00-12:00)</option>
-                      <option value="afternoon">☀️ Tarde (12:01-18:00)</option>
-                      <option value="evening">🌙 Noche (18:01-23:59)</option>
-                    </select>
-                  </div>
-
-                  <!-- Solo notificaciones -->
-                  <div class="schedule-options-simple">
-                    <label class="switch-simple">
-                      <input type="checkbox" [(ngModel)]="schedule.notificationEnabled">
-                      <span class="slider-simple"></span>
-                      <span class="option-text">🔔 Recibir notificaciones</span>
-                    </label>
-                  </div>
-                  
-                  <button type="button" class="btn-remove-simple" (click)="removeScheduleFromEditForm(i)">
-                    🗑️ Eliminar
-                  </button>
-                </div>
-              </div>
-              
-              <p class="schedules-help" *ngIf="editForm.schedules.length === 0">
-                Agrega horarios específicos para recibir recordatorios.
-              </p>
-            </div>
-
-            <!-- Días personalizados para frecuencia semanal -->
-            <div class="form-group" *ngIf="editForm.frequency === 'custom'">
-              <label>Días de la semana:</label>
-              <div class="days-selector">
-                <label *ngFor="let day of weekDays" class="day-checkbox">
-                  <input 
-                    type="checkbox" 
-                    [value]="day.value"
-                    [checked]="editForm.customDays.includes(day.value)"
-                    (change)="toggleEditCustomDay($event, day.value)">
-                  <span>{{ day.name.substring(0, 3) }}</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Día del mes para frecuencia mensual -->
-            <div class="form-group" *ngIf="editForm.frequency === 'monthly'">
-              <label for="edit-custom-day">Día del mes (1-31):</label>
-              <input 
-                type="number" 
-                id="edit-custom-day"
-                [(ngModel)]="editForm.customDayOfMonth" 
-                min="1" 
-                max="31" 
-                class="form-input">
-            </div>
-
-            <div class="edit-actions">
-              <button type="button" class="btn-save" (click)="saveEditActivity()">
-                💾 Guardar cambios
-              </button>
-              <button type="button" class="btn-cancel" (click)="cancelEditActivity()">
-                ❌ Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Mensaje cuando no hay actividades en este horario -->
-      <div class="no-activities" *ngIf="getActivitiesByTimeOfDay(period.value).length === 0">
-        <p>No hay actividades programadas para {{ period.name.toLowerCase() }}</p>
-      </div>
+  <!-- Vista del Gestor de Hábitos Completo -->
+  <div class="habits-manager-section" *ngIf="showHabitsManager">
+    <div class="section-header">
+      <h2 class="section-title">🎯 Gestión Completa de Hábitos</h2>
+      <p class="section-subtitle">Crea, edita y organiza todos tus hábitos diarios</p>
     </div>
+    
+    <app-habits-manager
+      [showAddButton]="true"
+      [compactMode]="false"
+      [maxHabitsToShow]="0"
+      (statsChanged)="onHabitsStatsChanged($event)"
+      (habitAdded)="onHabitAdded($event)"
+      (habitCompleted)="onHabitCompleted($event)"
+      (habitDeleted)="onHabitDeleted($event)">
+    </app-habits-manager>
   </div>
 
-  <!-- Sección de motivación (corregida) -->
-  <div class="motivation-section" *ngIf="shouldShowMotivation()">
-    <app-motivacion 
-      [completionRate]="stats.completionRate"
-      [currentStreak]="stats.currentStreak" 
-      [totalActivities]="stats.totalActivities">
-    </app-motivacion>
-  </div>
-
-  <!-- Hábitos recomendados -->
-  <div class="recommendations-section">
-    <app-habitos-recomendados 
-      [habitosActuales]="activities"
-      (agregarHabito)="onRecommendedHabitAdded($event)">
-    </app-habitos-recomendados>
-  </div>
 </div>

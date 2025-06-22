@@ -1,4 +1,4 @@
-/* dashboard.component.css - Estilos mejorados */
+/* dashboard.component.css - Estilos simplificados para el dashboard */
 
 .dashboard-container {
   max-width: 1200px;
@@ -104,800 +104,188 @@
   margin: 0;
 }
 
-/* ========== ACTIVIDADES POR HORARIO ========== */
-.activities-by-time {
-  margin-bottom: 3rem;
-}
-
-.time-period-container {
-  background: white;
-  border-radius: 20px;
-  margin-bottom: 2rem;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.time-period-container.current-period {
-  border: 3px solid #4CAF50;
-  box-shadow: 0 10px 30px rgba(76, 175, 80, 0.2);
-}
-
-.time-period-header {
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-  padding: 1.5rem 2rem;
+/* ========== NAVEGACIÓN RÁPIDA ========== */
+.quick-navigation {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.current-period .time-period-header {
-  background: linear-gradient(135deg, #e8f5e8, #d4edda);
-}
-
-.period-info {
-  display: flex;
-  align-items: center;
   gap: 1rem;
+  margin-bottom: 3rem;
+  justify-content: center;
 }
 
-.period-icon {
-  font-size: 2rem;
-}
-
-.time-period-header h2 {
-  font-size: 1.8rem;
-  color: #333;
-  margin: 0;
-}
-
-.time-range {
-  background: rgba(0, 0, 0, 0.1);
-  padding: 0.3rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
+.nav-button {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem 2rem;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  font-weight: 600;
   color: #666;
 }
 
-.period-stats {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.activities-count {
-  background: #007bff;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-/* ========== LISTA DE ACTIVIDADES ========== */
-.activities-list {
-  padding: 0;
-}
-
-.activity-card {
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid #f0f0f0;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.activity-card:last-child {
-  border-bottom: none;
-}
-
-.activity-card:hover {
-  background: #f8f9fa;
-}
-
-.activity-card.completed {
-  background: linear-gradient(135deg, #e8f5e8, #f0f8f0);
-  opacity: 0.8;
-}
-
-.activity-card.editing {
-  background: #fff3cd;
-  border: 2px solid #ffc107;
-}
-
-/* ========== BOTÓN ÚNICO DE COMPLETADO ========== */
-.activity-complete-left {
-  display: flex;
-  align-items: center;
-  min-width: 100px;
-}
-
-.btn-complete-unified {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.3rem;
-  background: white;
-  border: 2px solid #ddd;
-  border-radius: 12px;
-  padding: 0.8rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 80px;
-  font-size: 0.9rem;
-}
-
-.btn-complete-unified:hover {
+.nav-button:hover {
+  border-color: #4CAF50;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.btn-complete-unified.completed {
+.nav-button.active {
   background: #4CAF50;
   border-color: #4CAF50;
   color: white;
+  box-shadow: 0 5px 20px rgba(76, 175, 80, 0.3);
 }
 
-.complete-icon {
+.nav-icon {
   font-size: 1.3rem;
 }
 
-.complete-text {
-  font-size: 0.8rem;
-  font-weight: 500;
+/* ========== SECCIONES PRINCIPALES ========== */
+.dashboard-main {
+  animation: fadeIn 0.5s ease-in;
 }
 
-/* ========== FORMULARIOS SIMPLIFICADOS ========== */
-.schedules-simple {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-top: 1rem;
+.habits-manager-section {
+  animation: fadeIn 0.5s ease-in;
 }
 
-.schedule-simple-card {
-  background: #f8f9fa;
-  border: 2px solid #e9ecef;
-  border-radius: 15px;
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-}
-
-.schedule-simple-card:hover {
-  border-color: #4CAF50;
-  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.1);
-}
-
-/* ========== SELECTOR DE TIPO ========== */
-.schedule-type-selector {
+.section-title {
+  font-size: 1.8rem;
+  color: #333;
   margin-bottom: 1rem;
-}
-
-.radio-group {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.radio-option {
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  cursor: pointer;
-  background: white;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  border: 2px solid #e9ecef;
-  transition: all 0.3s ease;
 }
 
-.radio-option:hover {
-  border-color: #4CAF50;
-}
-
-.radio-option input[type="radio"] {
-  margin: 0;
-}
-
-.radio-option input[type="radio"]:checked + span {
-  font-weight: 600;
-}
-
-.radio-option:has(input:checked) {
-  background: #4CAF50;
-  border-color: #4CAF50;
-  color: white;
-}
-
-/* ========== SELECTORES ESPECÍFICOS ========== */
-.time-selector, .period-selector {
-  margin-bottom: 1rem;
-}
-
-.time-selector label, .period-selector label {
-  display: block;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.time-input-simple {
-  width: 100%;
-  padding: 0.8rem 1rem;
-  border: 2px solid #e9ecef;
-  border-radius: 10px;
+.section-subtitle {
+  color: #666;
+  margin-bottom: 2rem;
   font-size: 1.1rem;
-  font-weight: 600;
+}
+
+.section-header {
   text-align: center;
-  transition: border-color 0.3s ease;
-  background: white;
+  margin-bottom: 3rem;
 }
 
-.time-input-simple:focus {
-  outline: none;
-  border-color: #4CAF50;
-  box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
-}
-
-.auto-period {
-  display: block;
-  margin-top: 0.5rem;
-  color: #666;
-  font-style: italic;
-  font-size: 0.85rem;
-}
-
-.period-select-simple {
-  width: 100%;
-  padding: 0.8rem 1rem;
-  border: 2px solid #e9ecef;
-  border-radius: 10px;
-  font-size: 1rem;
-  background: white;
-  cursor: pointer;
-  transition: border-color 0.3s ease;
-}
-
-.period-select-simple:focus {
-  outline: none;
-  border-color: #4CAF50;
-}
-
-/* ========== OPCIONES SIMPLIFICADAS ========== */
-.schedule-options-simple {
-  margin: 1rem 0;
-}
-
-.switch-simple {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  cursor: pointer;
-}
-
-.switch-simple input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-}
-
-.slider-simple {
-  width: 45px;
-  height: 24px;
-  background-color: #ccc;
-  border-radius: 24px;
-  position: relative;
-  transition: background-color 0.3s;
-  cursor: pointer;
-}
-
-.slider-simple:before {
-  content: '';
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  background-color: white;
-  border-radius: 50%;
-  top: 3px;
-  left: 3px;
-  transition: transform 0.3s;
-}
-
-.switch-simple input:checked + .slider-simple {
-  background-color: #4CAF50;
-}
-
-.switch-simple input:checked + .slider-simple:before {
-  transform: translateX(21px);
-}
-
-.option-text {
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-/* ========== BOTÓN ELIMINAR SIMPLE ========== */
-.btn-remove-simple {
-  background: #dc3545;
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
-
-.btn-remove-simple:hover {
-  background: #c82333;
-  transform: translateY(-1px);
-}
-
-/* ========== AYUDA SIMPLIFICADA ========== */
-.schedules-help-simple {
-  background: #e7f3ff;
-  border-left: 4px solid #007bff;
-  padding: 1rem;
-  border-radius: 5px;
-  margin-top: 1rem;
-}
-
-.schedules-help-simple p {
-  margin-bottom: 0.8rem;
-  font-weight: 600;
-}
-
-.help-options {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.help-option {
-  background: white;
-  padding: 0.8rem;
-  border-radius: 8px;
-  border-left: 3px solid #007bff;
-  font-size: 0.9rem;
-}
-
-/* ========== RESPONSIVE DESIGN ACTUALIZADO ========== */
-@media (max-width: 768px) {
-  .activity-content {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
-
-  .activity-complete-left {
-    align-self: center;
-    min-width: auto;
-  }
-
-  .radio-group {
-    flex-direction: column;
-  }
-
-  .help-options {
-    gap: 0.3rem;
-  }
-}
-
-/* Remover estilos obsoletos de schedules-grid, schedule-card, etc. */
-
-.activity-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-}
-
-.activity-title-section {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  flex: 1;
-}
-
-.category-icon {
-  font-size: 1.5rem;
-  margin-top: 0.2rem;
-}
-
-.activity-info {
-  flex: 1;
-}
-
-.activity-title {
-  font-size: 1.3rem;
-  color: #333;
-  margin: 0 0 0.5rem 0;
-  font-weight: 600;
-}
-
-.activity-description {
-  color: #666;
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-
-.activity-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.btn-icon {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  padding: 0.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.btn-icon:hover {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.btn-icon.edit:hover {
-  background: rgba(255, 193, 7, 0.2);
-}
-
-.btn-icon.delete:hover {
-  background: rgba(220, 53, 69, 0.2);
-}
-
-/* ========== HORARIOS DE ACTIVIDAD ========== */
-.activity-schedules {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.schedule-item {
-  background: #e9ecef;
-  padding: 0.3rem 0.8rem;
-  border-radius: 15px;
-  font-size: 0.85rem;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.schedule-item.current-schedule {
-  background: #4CAF50;
-  color: white;
-  font-weight: 600;
-}
-
-.schedule-time {
-  font-weight: 500;
-}
-
-.notification-status {
-  font-size: 0.8rem;
-}
-
-.schedule-disabled {
-  opacity: 0.6;
-}
-
-/* ========== METADATOS DE ACTIVIDAD ========== */
-.activity-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.frequency, .category, .streak {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.streak {
-  color: #ff6b35;
-  font-weight: 600;
-}
-
-/* ========== FORMULARIOS ========== */
-.edit-form, .add-activity-form {
+/* ========== RESUMEN DE HÁBITOS ========== */
+.habits-summary-section {
   background: white;
   border-radius: 20px;
   padding: 2rem;
+  margin-bottom: 3rem;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
 }
 
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: #333;
-}
-
-.form-input, .form-textarea, .form-select {
-  width: 100%;
-  padding: 0.8rem 1rem;
-  border: 2px solid #e9ecef;
-  border-radius: 10px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-  box-sizing: border-box;
-}
-
-.form-input:focus, .form-textarea:focus, .form-select:focus {
-  outline: none;
-  border-color: #4CAF50;
-}
-
-.form-textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-/* ========== HORARIOS EN FORMULARIOS ========== */
-.schedules-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.btn-add-schedule {
-  background: #4CAF50;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background 0.3s ease;
-}
-
-.btn-add-schedule:hover {
-  background: #45a049;
-}
-
-.schedules-list {
-  margin-bottom: 1rem;
-}
-
-.schedule-form {
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 10px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-}
-
-.schedule-inputs {
-  display: grid;
-  grid-template-columns: auto auto 1fr 1fr auto;
-  gap: 1rem;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.time-input, .timeofday-select {
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 0.9rem;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.checkbox-label input[type="checkbox"] {
-  width: auto;
-}
-
-.btn-remove-schedule {
-  background: #dc3545;
-  color: white;
-  border: none;
-  padding: 0.3rem 0.6rem;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.8rem;
-}
-
-.btn-remove-schedule:hover {
-  background: #c82333;
-}
-
-.schedule-preview {
-  color: #666;
-  font-style: italic;
-}
-
-.schedules-help {
-  background: #e7f3ff;
-  border-left: 4px solid #007bff;
-  padding: 1rem;
-  border-radius: 5px;
-  margin-top: 1rem;
-}
-
-.schedules-help p {
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-}
-
-.schedules-help ul {
-  margin: 0;
-  padding-left: 1.5rem;
-}
-
-.schedules-help li {
-  margin-bottom: 0.3rem;
-}
-
-/* ========== SELECTORES DE DÍAS ========== */
-.days-selector {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.day-checkbox {
-  background: #f8f9fa;
-  border: 2px solid #e9ecef;
-  border-radius: 10px;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.day-checkbox:hover {
-  background: #e9ecef;
-}
-
-.day-checkbox input[type="checkbox"] {
-  display: none;
-}
-
-.day-checkbox input[type="checkbox"]:checked + span {
-  font-weight: 600;
-}
-
-.day-checkbox:has(input:checked) {
-  background: #4CAF50;
-  border-color: #4CAF50;
-  color: white;
-}
-
-/* ========== BOTONES DE ACCIÓN ========== */
-.form-actions, .edit-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
+.view-all-section {
+  text-align: center;
   margin-top: 2rem;
 }
 
-.btn-create, .btn-save, .btn-cancel {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.8rem 1.5rem;
-  border: none;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-create, .btn-save {
-  background: #4CAF50;
-  color: white;
-}
-
-.btn-create:hover, .btn-save:hover {
-  background: #45a049;
-  transform: translateY(-2px);
-}
-
-.btn-create:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-cancel {
-  background: #6c757d;
-  color: white;
-}
-
-.btn-cancel:hover {
-  background: #5a6268;
-}
-
-/* ========== BOTÓN PRINCIPAL AGREGAR - ARRIBA ========== */
-.add-activity-section {
-  text-align: center;
-  margin-bottom: 2rem;
-  margin-top: 1rem; /* Espacio desde las estadísticas */
-}
-
-.btn-add-main {
-  background: linear-gradient(135deg, #4CAF50, #45a049);
+.btn-view-all {
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   border: none;
   padding: 1rem 2rem;
   border-radius: 50px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.8rem;
-  box-shadow: 0 5px 20px rgba(76, 175, 80, 0.3);
 }
 
-.btn-add-main:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(76, 175, 80, 0.4);
+.btn-view-all:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
 }
 
-.add-icon {
-  font-size: 1.3rem;
-}
-
-/* ========== FORMULARIO AGREGAR ACTIVIDAD ========== */
-.add-activity-form {
+/* ========== SECCIÓN DE MOTIVACIÓN ========== */
+.motivation-section {
   background: white;
   border-radius: 20px;
   padding: 2rem;
+  margin-bottom: 3rem;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-  margin-bottom: 3rem; /* Más espacio antes de las actividades */
 }
 
-.add-activity-form h3 {
-  color: #333;
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-  text-align: center;
-}
-
-/* ========== SECCIONES ADICIONALES ========== */
-.motivation-section {
-  margin-bottom: 2rem;
-}
-
+/* ========== SECCIÓN DE RECOMENDACIONES ========== */
 .recommendations-section {
-  margin-bottom: 2rem;
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
 }
 
-.no-activities {
+/* ========== ENLACES RÁPIDOS ========== */
+.quick-links-section {
+  background: white;
+  border-radius: 20px;
   padding: 2rem;
+  margin-bottom: 3rem;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.quick-link-card {
+  background: #f8f9fa;
+  border-radius: 15px;
+  padding: 1.5rem;
   text-align: center;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.quick-link-card:hover {
+  background: white;
+  border-color: #4CAF50;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.link-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.quick-link-card h3 {
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.quick-link-card p {
   color: #666;
-  font-style: italic;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.btn-link {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-link:hover {
+  background: #45a049;
+  transform: translateY(-1px);
 }
 
 /* ========== ANIMACIONES ========== */
@@ -923,35 +311,37 @@
   }
 
   .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .quick-navigation {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .nav-button {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .quick-links-grid {
     grid-template-columns: 1fr;
   }
 
-  .time-period-header {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-
-  .activity-content {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .activity-header {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .schedule-inputs {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-
-  .form-actions, .edit-actions {
-    flex-direction: column;
-  }
-
-  .days-selector {
-    grid-template-columns: repeat(3, 1fr);
+  .habits-summary-section,
+  .motivation-section,
+  .recommendations-section,
+  .quick-links-section {
+    padding: 1.5rem;
   }
 }
