@@ -1,0 +1,64 @@
+<div class="weather-page">
+    <header class="weather-header">
+      <h1>🌤️ Consulta del Clima</h1>
+      <p>Obtén información meteorológica actualizada de cualquier ciudad del mundo</p>
+    </header>
+  
+    <main class="weather-main">
+      <div class="weather-container">
+        <!-- Formulario de búsqueda -->
+        <div class="search-container">
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Ingresa el nombre de una ciudad..." 
+            [(ngModel)]="cityInput"
+            (keypress)="onKeyPress($event)"
+            [disabled]="loading">
+          <button 
+            class="search-btn" 
+            (click)="getWeather()"
+            [disabled]="loading">
+            {{ loading ? 'Buscando...' : 'Buscar' }}
+          </button>
+        </div>
+  
+        <!-- Indicador de carga -->
+        <div class="loading" *ngIf="loading">
+          🔄 Cargando información del clima...
+        </div>
+  
+        <!-- Mensaje de error -->
+        <div class="error" *ngIf="error && !loading">
+          {{ error }}
+        </div>
+  
+        <!-- Información del clima -->
+        <div class="weather-info" *ngIf="weatherData && !loading && !error">
+          <div class="city-name">{{ cityName }}</div>
+          <div class="weather-icon">{{ getWeatherIcon(description) }}</div>
+          <div class="temperature">{{ temperature }}°C</div>
+          <div class="description">{{ description }}</div>
+          
+          <div class="weather-details">
+            <div class="detail-item">
+              <div class="detail-label">Sensación térmica</div>
+              <div class="detail-value">{{ feelsLike }}°C</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Humedad</div>
+              <div class="detail-value">{{ humidity }}%</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Velocidad del viento</div>
+              <div class="detail-value">{{ windSpeed }} m/s</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Presión</div>
+              <div class="detail-value">{{ pressure }} hPa</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>

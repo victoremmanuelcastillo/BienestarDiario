@@ -1,107 +1,44 @@
-<div class="motivation-card" [@fadeInOut]>
-    <!-- Loader cuando está cargando nuevos mensajes -->
-    <div class="loading-overlay" *ngIf="cargando" [@slideIn]>
-      <div class="loading-spinner"></div>
-      <p>Generando nuevos mensajes motivacionales...</p>
+<!-- motivacion.component.html -->
+<div class="motivacion-container" *ngIf="mostrarMensaje">
+  <div class="motivacion-card" [style.border-left-color]="obtenerColorMensaje()">
+    <div class="motivacion-header">
+      <span class="motivacion-icon">{{ obtenerIconoProgreso() }}</span>
+      <h3 class="motivacion-titulo">Mensaje de Motivación</h3>
+      <button class="btn-refresh" (click)="refrescarMensaje()" title="Nuevo mensaje">
+        🔄
+      </button>
     </div>
-  
-    <!-- Contenido principal -->
-    <div class="motivation-content" *ngIf="!cargando">
-      <!-- Header con indicador de progreso -->
-      <div class="motivation-header">
-        <div class="progress-indicator">
-          <span class="progress-badge" [ngClass]="'badge-' + getNormalizedType()">
-            {{ tipoMensajeActual }}
-          </span>
-          <span class="progress-percentage">{{ stats.completionRate }}%</span>
+    
+    <div class="motivacion-content">
+      <p class="mensaje-principal" [style.color]="obtenerColorMensaje()">
+        {{ mensajeActual }}
+      </p>
+      
+      <p class="contexto-adicional" *ngIf="obtenerContextoMotivacion()">
+        {{ obtenerContextoMotivacion() }}
+      </p>
+    </div>
+    
+    <div class="progreso-visual">
+      <div class="progreso-bar">
+        <div class="progreso-fill" 
+             [style.width.%]="completionRate"
+             [style.background-color]="obtenerColorMensaje()">
         </div>
-        
-        <button 
-          class="btn-details" 
-          (click)="toggleDetalles()"
-          [attr.aria-label]="mostrarDetalles ? 'Ocultar detalles' : 'Mostrar detalles'"
-          title="Ver detalles de motivación"
-        >
-          <span class="details-icon" [class.rotated]="mostrarDetalles">ℹ️</span>
-        </button>
       </div>
-  
-      <!-- Mensaje motivacional principal -->
-      <div class="motivation-message" [@fadeInOut]>
-        <div class="message-icon">💪</div>
-        <h3>{{ mensajeActual }}</h3>
+      <span class="progreso-texto">{{ completionRate }}% completado hoy</span>
+    </div>
+    
+    <div class="motivacion-stats" *ngIf="currentStreak > 0 || totalActivities > 0">
+      <div class="stat-item" *ngIf="currentStreak > 0">
+        <span class="stat-icon">🔥</span>
+        <span class="stat-text">{{ currentStreak }} días consecutivos</span>
       </div>
-  
-      <!-- Barra de progreso visual -->
-      <div class="progress-bar-container">
-        <div class="progress-bar">
-          <div 
-            class="progress-fill" 
-            [style.width.%]="stats.completionRate"
-            [ngClass]="'progress-' + getNormalizedType()"
-          ></div>
-        </div>
-        <span class="progress-text">
-          {{ stats.completedToday }} de {{ stats.totalActivities }} actividades
-        </span>
-      </div>
-  
-      <!-- Panel de detalles expandible -->
-      <div class="details-panel" *ngIf="mostrarDetalles" [@slideIn]>
-        <div class="stats-mini">
-          <div class="stat-mini">
-            <span class="stat-icon">🔥</span>
-            <div class="stat-info">
-              <span class="stat-value">{{ stats.currentStreak }}</span>
-              <span class="stat-label">días de racha</span>
-            </div>
-          </div>
-          
-          <div class="stat-mini">
-            <span class="stat-icon">🎯</span>
-            <div class="stat-info">
-              <span class="stat-value">{{ stats.completionRate }}%</span>
-              <span class="stat-label">completado hoy</span>
-            </div>
-          </div>
-        </div>
-  
-        <!-- Información sobre mensajes -->
-        <div class="message-info">
-          <p class="info-text">
-            <strong>📝 Mensajes motivacionales:</strong> 
-            {{ getEstadisticasMotivacion().mensajesDisponibles }} disponibles
-          </p>
-          <p class="info-text" *ngIf="getEstadisticasMotivacion().proximaActualizacion > 0">
-            <strong>📅 Próxima actualización:</strong> 
-            en {{ getEstadisticasMotivacion().proximaActualizacion }} días
-          </p>
-        </div>
-  
-        <!-- Botón para forzar actualización -->
-        <button 
-          class="btn-refresh" 
-          (click)="forzarActualizacion()"
-          title="Generar nuevos mensajes motivacionales"
-        >
-          <span class="refresh-icon">🔄</span>
-          Nuevos mensajes
-        </button>
-      </div>
-  
-      <!-- Botón de acción contextual -->
-      <div class="action-section">
-        <button 
-          class="btn-action" 
-          [ngClass]="'btn-' + getNormalizedType()"
-          (click)="actualizarMensaje()"
-          title="Obtener nuevo mensaje motivacional"
-        >
-          <span class="action-icon">✨</span>
-          <span *ngIf="stats.completionRate === 0">¡Empezar ahora!</span>
-          <span *ngIf="stats.completionRate > 0 && stats.completionRate < 100">¡Seguir adelante!</span>
-          <span *ngIf="stats.completionRate === 100">¡Celebrar logro!</span>
-        </button>
+      
+      <div class="stat-item" *ngIf="totalActivities > 0">
+        <span class="stat-icon">📊</span>
+        <span class="stat-text">{{ totalActivities }} hábitos activos</span>
       </div>
     </div>
   </div>
+</div>

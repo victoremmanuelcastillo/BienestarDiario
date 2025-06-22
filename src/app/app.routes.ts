@@ -33,6 +33,8 @@ import { ProgresoComponent } from './progreso/progreso.component';
 import { ChatIAComponent } from './chat-ia/chat-ia.component';
 import { IntroModalComponent } from './dashboard/intro-habitos/intro-habitos.component';
 import { MotivacionComponent } from './dashboard/motivacion/motivacion.component';	
+import { ClimaComponent } from './clima/clima.component';
+	
 
 export const routes: Routes = [
   { 
@@ -58,6 +60,7 @@ export const routes: Routes = [
       { path: 'graficas-habitos', component: GraficasHabitosComponent},
       { path: 'graficas', component: GraficasComponent },
       { path: 'progreso', component: ProgresoComponent },
+      { path: 'clima', component: ClimaComponent },
       
       // Rutas de nutrición
       { path: 'nutricion', component: NutricionComponent },
