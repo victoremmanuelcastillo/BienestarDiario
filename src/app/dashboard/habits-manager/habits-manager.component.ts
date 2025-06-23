@@ -1,5 +1,5 @@
-// habits-manager.component.ts - Componente separado para gestión de hábitos
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
+// habits-manager.component.ts - Componente separado para gestión de hábitos - VERSIÓN OPTIMIZADA
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil, interval } from 'rxjs';
@@ -47,6 +47,7 @@ interface CategoryInfo {
   imports: [CommonModule, FormsModule],
   templateUrl: './habits-manager.component.html',
   styleUrls: ['./habits-manager.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('slideIn', [
       transition(':enter', [
@@ -65,6 +66,12 @@ interface CategoryInfo {
 export class HabitsManagerComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private notificationCheckInterval$ = interval(60000);
+
+  // ========== PROPIEDADES DE CACHE PARA OPTIMIZACIÓN ==========
+  private _cachedOrderedPeriods: any[] | null = null;
+  private _lastOrderUpdateTime: number | null = null;
+  private _habitsByTimeCache = new Map<string, Habit[]>();
+  private _lastHabitsUpdate: number = 0;
 
   // Inputs para configurar el componente desde el padre
   @Input() showAddButton: boolean = true;
@@ -123,9 +130,14 @@ export class HabitsManagerComponent implements OnInit, OnDestroy {
     { value: 'evening' as TimeOfDay, name: 'Noche', icon: '🌙', timeRange: '18:01-23:59' }
   ];
 
+  constructor(private cdr: ChangeDetectorRef) {}
+
   ngOnInit(): void {
     this.loadHabits();
     this.emitStatsChanged();
+    
+    // Inicializar cache
+    this.forceViewUpdate();
     
     this.notificationCheckInterval$
       .pipe(takeUntil(this.destroy$))
@@ -133,20 +145,67 @@ export class HabitsManagerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Limpiar caches
+    this._habitsByTimeCache.clear();
+    this._cachedOrderedPeriods = null;
+    
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  // ========== TRACKBY FUNCTIONS PARA OPTIMIZACIÓN ==========
+
+  trackByHabitId(index: number, habit: Habit): string {
+    return habit?.id || index.toString();
+  }
+
+  trackByTimeOfDay(index: number, period: any): string {
+    return period?.value || index.toString();
+  }
+
+  trackByScheduleIndex(index: number, schedule: any): string {
+    return `${index}_${schedule?.time || ''}_${schedule?.timeOfDay || ''}`;
+  }
+
+  trackByScheduleId(index: number, schedule: HabitSchedule): string {
+    return schedule?.id || index.toString();
+  }
+
+  trackByDayValue(index: number, day: any): number {
+    return day?.value ?? index;
+  }
+
+  // ========== MÉTODOS DE ESTABILIZACIÓN ==========
+
+  // Método para forzar actualización de vista sin causar loops
+  private forceViewUpdate(): void {
+    this._lastHabitsUpdate = Date.now();
+    this._habitsByTimeCache.clear();
+    this._cachedOrderedPeriods = null;
   }
 
   // ========== GESTIÓN DE HÁBITOS ==========
 
   saveHabits(): void {
     localStorage.setItem('bienestar-habits', JSON.stringify(this.habits));
+    this._lastHabitsUpdate = Date.now();
+    this._habitsByTimeCache.clear();
+    this._cachedOrderedPeriods = null;
     this.emitStatsChanged();
   }
 
   addHabit(): void {
     if (!this.newHabit.title.trim()) return;
-
+  
+    // Si no se seleccionó ningún horario, agregar uno por defecto en la mañana
+    if (this.newHabit.schedules.length === 0) {
+      this.newHabit.schedules.push({
+        time: '', // Sin hora específica
+        timeOfDay: 'morning', // Por defecto en la mañana
+        notificationEnabled: false // Sin notificación por defecto
+      });
+    }
+  
     const habit: Habit = {
       id: Date.now().toString(),
       title: this.newHabit.title,
@@ -161,19 +220,161 @@ export class HabitsManagerComponent implements OnInit, OnDestroy {
       completionHistory: [],
       schedules: this.newHabit.schedules.map(s => ({
         id: Date.now().toString() + Math.random(),
-        time: s.time,
+        time: s.time || undefined, // Puede ser undefined para horario por período
         timeOfDay: s.timeOfDay,
         notificationEnabled: s.notificationEnabled
       })),
       scheduleCompletions: {},
       isEditing: false
     };
-
+  
     this.habits.push(habit);
     this.saveHabits();
     this.habitAdded.emit(habit);
     this.resetForm();
     this.showAddHabit = false;
+    this.cdr.detectChanges();
+  }
+
+  // ========== GESTIÓN DE HORARIOS PARA NUEVO HÁBITO ==========
+
+  addScheduleToForm(): void {
+    this.newHabit.schedules.push({
+      time: '',
+      timeOfDay: 'morning',
+      notificationEnabled: true
+    });
+  }
+
+  removeScheduleFromForm(index: number): void {
+    this.newHabit.schedules.splice(index, 1);
+  }
+
+  setScheduleType(schedule: any, type: 'time' | 'period'): void {
+    if (type === 'time') {
+      schedule.time = '08:00';
+      this.updateScheduleTimeOfDay(schedule, schedule.time);
+    } else {
+      schedule.time = '';
+      schedule.timeOfDay = 'morning';
+    }
+  }
+
+  updateScheduleTimeOfDay(schedule: any, time: string): void {
+    if (!time) return;
+    
+    const [hours] = time.split(':').map(Number);
+    if (hours >= 6 && hours < 12) {
+      schedule.timeOfDay = 'morning';
+    } else if (hours >= 12 && hours < 18) {
+      schedule.timeOfDay = 'afternoon';
+    } else {
+      schedule.timeOfDay = 'evening';
+    }
+  }
+
+  // ========== GESTIÓN DE HORARIOS PARA EDICIÓN ==========
+
+  addScheduleToEditForm(): void {
+    this.editForm.schedules.push({
+      time: '',
+      timeOfDay: 'morning',
+      notificationEnabled: true
+    });
+  }
+  
+  removeScheduleFromEditForm(index: number): void {
+    this.editForm.schedules.splice(index, 1);
+  }
+  
+  setEditScheduleType(schedule: any, type: 'time' | 'period'): void {
+    if (type === 'time') {
+      schedule.time = '08:00';
+      this.updateScheduleTimeOfDay(schedule, schedule.time);
+    } else {
+      schedule.time = '';
+      schedule.timeOfDay = 'morning';
+    }
+  }
+
+  // ========== EDICIÓN ==========
+
+  startEditHabit(habit: Habit): void {
+    this.editingHabit = habit;
+    this.editForm = {
+      title: habit.title,
+      description: habit.description || '',
+      category: habit.category,
+      frequency: habit.frequency,
+      customDays: [...(habit.customDays || [])],
+      customDayOfMonth: habit.customDayOfMonth || 1,
+      schedules: habit.schedules.map(s => ({
+        time: s.time || '',
+        timeOfDay: s.timeOfDay,
+        notificationEnabled: s.notificationEnabled
+      }))
+    };
+    habit.isEditing = true;
+    this.cdr.detectChanges();
+  }
+
+  saveEditHabit(): void {
+    if (!this.editingHabit || !this.editForm.title.trim()) return;
+  
+    // Si no hay horarios en el formulario de edición, agregar uno por defecto
+    if (this.editForm.schedules.length === 0) {
+      this.editForm.schedules.push({
+        time: '',
+        timeOfDay: 'morning',
+        notificationEnabled: false
+      });
+    }
+  
+    this.editingHabit.title = this.editForm.title;
+    this.editingHabit.description = this.editForm.description;
+    this.editingHabit.category = this.editForm.category;
+    this.editingHabit.frequency = this.editForm.frequency;
+    this.editingHabit.customDays = [...this.editForm.customDays];
+    this.editingHabit.customDayOfMonth = this.editForm.customDayOfMonth;
+    this.editingHabit.schedules = this.editForm.schedules.map(s => ({
+      id: Date.now().toString() + Math.random(),
+      time: s.time || undefined,
+      timeOfDay: s.timeOfDay,
+      notificationEnabled: s.notificationEnabled
+    }));
+    this.editingHabit.isEditing = false;
+  
+    this.saveHabits();
+    this.editingHabit = null;
+    this.cdr.detectChanges();
+  }
+
+  cancelEditHabit(): void {
+    if (this.editingHabit) {
+      this.editingHabit.isEditing = false;
+      this.editingHabit = null;
+    }
+    this.cdr.detectChanges();
+  }
+
+  toggleEditCustomDay(event: any, dayValue: number): void {
+    const isChecked = event.target.checked;
+    if (isChecked) {
+      if (!this.editForm.customDays.includes(dayValue)) {
+        this.editForm.customDays.push(dayValue);
+      }
+    } else {
+      this.editForm.customDays = this.editForm.customDays.filter(d => d !== dayValue);
+    }
+  }
+
+  deleteHabit(habit: Habit): void {
+    if (confirm(`¿Estás seguro de que quieres eliminar "${habit.title}"?`)) {
+      this.habits = this.habits.filter(h => h.id !== habit.id);
+      this.saveHabits();
+      this.habitDeleted.emit(habit);
+      this.cdr.detectChanges();
+    }
   }
 
   // ========== COMPLETAR HÁBITOS ==========
@@ -195,8 +396,10 @@ export class HabitsManagerComponent implements OnInit, OnDestroy {
     }
     
     this.updateHabitCompletionStatus(habit);
+    this.forceViewUpdate();
     this.saveHabits();
     this.habitCompleted.emit({habit, schedule});
+    this.cdr.detectChanges();
   }
 
   isScheduleCompletedToday(habit: Habit, schedule: HabitSchedule): boolean {
@@ -259,18 +462,25 @@ export class HabitsManagerComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ========== ORGANIZACIÓN POR HORARIOS ==========
+  // ========== ORGANIZACIÓN POR HORARIOS - OPTIMIZADA ==========
 
   getHabitsByTimeOfDay(timeOfDay: TimeOfDay): Habit[] {
+    const cacheKey = `${timeOfDay}_${this._lastHabitsUpdate}`;
+    
+    if (this._habitsByTimeCache.has(cacheKey)) {
+      return this._habitsByTimeCache.get(cacheKey)!;
+    }
+
     const filteredHabits = this.habits.filter(habit => 
-      habit.schedules.some(schedule => schedule.timeOfDay === timeOfDay)
+      habit.schedules && habit.schedules.some(schedule => schedule.timeOfDay === timeOfDay)
     );
     
-    if (this.maxHabitsToShow > 0) {
-      return filteredHabits.slice(0, this.maxHabitsToShow);
-    }
-    
-    return filteredHabits;
+    const result = this.maxHabitsToShow > 0 
+      ? filteredHabits.slice(0, this.maxHabitsToShow)
+      : filteredHabits;
+
+    this._habitsByTimeCache.set(cacheKey, result);
+    return result;
   }
 
   getCurrentTimeOfDay(): TimeOfDay {
@@ -302,97 +512,72 @@ export class HabitsManagerComponent implements OnInit, OnDestroy {
     return texts[timeOfDay] || '';
   }
 
-  // ========== GESTIÓN DE HORARIOS ==========
+  // ========== REORDENAMIENTO DINÁMICO DE PERÍODOS - OPTIMIZADO ==========
 
-  addScheduleToForm(): void {
-    this.newHabit.schedules.push({
-      time: '09:00',
-      timeOfDay: 'morning',
-      notificationEnabled: true
-    });
-  }
-
-  removeScheduleFromForm(index: number): void {
-    this.newHabit.schedules.splice(index, 1);
-  }
-
-  setScheduleType(schedule: any, type: 'time' | 'period'): void {
-    if (type === 'time') {
-      schedule.time = '08:00';
-      this.updateScheduleTimeOfDay(schedule, schedule.time);
-    } else {
-      schedule.time = '';
-      schedule.timeOfDay = 'morning';
+  getOrderedTimeOfDayPeriods(): typeof this.timeOfDayPeriods {
+    // Cachear el resultado para evitar recálculos innecesarios
+    if (this._cachedOrderedPeriods && this._lastOrderUpdateTime && 
+        (Date.now() - this._lastOrderUpdateTime) < 60000) {
+      return this._cachedOrderedPeriods;
     }
-  }
 
-  updateScheduleTimeOfDay(schedule: any, time: string): void {
-    if (!time) return;
+    const currentTimeOfDay = this.getCurrentTimeOfDay();
     
-    const [hours] = time.split(':').map(Number);
-    if (hours >= 6 && hours < 12) {
-      schedule.timeOfDay = 'morning';
-    } else if (hours >= 12 && hours < 18) {
-      schedule.timeOfDay = 'afternoon';
-    } else {
-      schedule.timeOfDay = 'evening';
+    const baseOrder = [
+      { value: 'morning' as TimeOfDay, name: 'Mañana', icon: '🌅', timeRange: '06:00-12:00' },
+      { value: 'afternoon' as TimeOfDay, name: 'Tarde', icon: '☀️', timeRange: '12:01-18:00' },
+      { value: 'evening' as TimeOfDay, name: 'Noche', icon: '🌙', timeRange: '18:01-23:59' }
+    ];
+    
+    let orderedPeriods;
+    switch (currentTimeOfDay) {
+      case 'morning':
+        orderedPeriods = [
+          baseOrder.find(p => p.value === 'morning')!,
+          baseOrder.find(p => p.value === 'afternoon')!,
+          baseOrder.find(p => p.value === 'evening')!
+        ];
+        break;
+      case 'afternoon':
+        orderedPeriods = [
+          baseOrder.find(p => p.value === 'afternoon')!,
+          baseOrder.find(p => p.value === 'evening')!,
+          baseOrder.find(p => p.value === 'morning')!
+        ];
+        break;
+      case 'evening':
+        orderedPeriods = [
+          baseOrder.find(p => p.value === 'evening')!,
+          baseOrder.find(p => p.value === 'morning')!,
+          baseOrder.find(p => p.value === 'afternoon')!
+        ];
+        break;
+      default:
+        orderedPeriods = baseOrder;
+    }
+
+    this._cachedOrderedPeriods = orderedPeriods;
+    this._lastOrderUpdateTime = Date.now();
+    
+    return orderedPeriods;
+  }
+
+  getCurrentPeriodName(): string {
+    const currentTimeOfDay = this.getCurrentTimeOfDay();
+    switch (currentTimeOfDay) {
+      case 'morning':
+        return 'Mañana';
+      case 'afternoon':
+        return 'Tarde';
+      case 'evening':
+        return 'Noche';
+      default:
+        return '';
     }
   }
 
-  // ========== EDICIÓN ==========
-
-  startEditHabit(habit: Habit): void {
-    this.editingHabit = habit;
-    this.editForm = {
-      title: habit.title,
-      description: habit.description || '',
-      category: habit.category,
-      frequency: habit.frequency,
-      customDays: [...(habit.customDays || [])],
-      customDayOfMonth: habit.customDayOfMonth || 1,
-      schedules: habit.schedules.map(s => ({
-        time: s.time || '',
-        timeOfDay: s.timeOfDay,
-        notificationEnabled: s.notificationEnabled
-      }))
-    };
-    habit.isEditing = true;
-  }
-
-  saveEditHabit(): void {
-    if (!this.editingHabit || !this.editForm.title.trim()) return;
-
-    this.editingHabit.title = this.editForm.title;
-    this.editingHabit.description = this.editForm.description;
-    this.editingHabit.category = this.editForm.category;
-    this.editingHabit.frequency = this.editForm.frequency;
-    this.editingHabit.customDays = [...this.editForm.customDays];
-    this.editingHabit.customDayOfMonth = this.editForm.customDayOfMonth;
-    this.editingHabit.schedules = this.editForm.schedules.map(s => ({
-      id: Date.now().toString() + Math.random(),
-      time: s.time || undefined,
-      timeOfDay: s.timeOfDay,
-      notificationEnabled: s.notificationEnabled
-    }));
-    this.editingHabit.isEditing = false;
-
-    this.saveHabits();
-    this.editingHabit = null;
-  }
-
-  cancelEditHabit(): void {
-    if (this.editingHabit) {
-      this.editingHabit.isEditing = false;
-      this.editingHabit = null;
-    }
-  }
-
-  deleteHabit(habit: Habit): void {
-    if (confirm(`¿Estás seguro de que quieres eliminar "${habit.title}"?`)) {
-      this.habits = this.habits.filter(h => h.id !== habit.id);
-      this.saveHabits();
-      this.habitDeleted.emit(habit);
-    }
+  isCurrentPeriod(periodValue: TimeOfDay): boolean {
+    return this.getCurrentTimeOfDay() === periodValue;
   }
 
   // ========== NOTIFICACIONES ==========
@@ -496,10 +681,6 @@ export class HabitsManagerComponent implements OnInit, OnDestroy {
     }
   }
 
-  trackByHabitId(index: number, habit: Habit): string {
-    return habit.id;
-  }
-
   loadHabits(): void {
     const saved = localStorage.getItem('bienestar-habits');
     if (saved) {
@@ -600,5 +781,19 @@ export class HabitsManagerComponent implements OnInit, OnDestroy {
       return `${hours}h ${mins}m`;
     }
     return `${mins}m`;
+  }
+
+  // ========== MÉTODOS DE DEBUGGING ==========
+
+  // Método para debugging (remover en producción)
+  debugScrollIssue(): void {
+    console.log('Habits length:', this.habits.length);
+    console.log('Cache size:', this._habitsByTimeCache.size);
+    console.log('Ordered periods:', this.getOrderedTimeOfDayPeriods());
+    
+    this.timeOfDayPeriods.forEach(period => {
+      const habits = this.getHabitsByTimeOfDay(period.value);
+      console.log(`${period.name}: ${habits.length} habits`);
+    });
   }
 }

@@ -130,18 +130,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  // ========== NAVEGACIÓN ==========
-
-  toggleHabitsManager(): void {
-    this.showHabitsManager = !this.showHabitsManager;
+  showFullHabitsManager(): void {
+    this.showHabitsManager = true;
   }
 
-  // ========== HÁBITOS RECOMENDADOS ==========
+  // Ocultar el gestor completo
+  hideFullHabitsManager(): void {
+    this.showHabitsManager = false;
+  }
 
   onRecommendedHabitAdded(habito: HabitoRecomendado): void {
-    // Mostrar el gestor de hábitos y pre-llenar el formulario
+    // Mostrar el gestor de hábitos para completar la configuración
     this.showHabitsManager = true;
-    // Aquí podrías emitir un evento al componente de hábitos para pre-llenar el formulario
     console.log('Hábito recomendado seleccionado:', habito);
   }
 }

@@ -1,7 +1,21 @@
-/* habits-manager.component.css - Estilos para el componente de hábitos */
+/* habits-manager.component.css - Estilos completos optimizados para evitar scroll en blanco */
 
 .habits-manager {
     width: 100%;
+    /* OPTIMIZACIÓN: Mejorar rendimiento de scroll */
+    contain: layout style paint;
+    transform: translateZ(0); /* Fuerza aceleración de hardware */
+  }
+  
+  /* ========== OPTIMIZACIONES PARA SCROLL ESTABLE ========== */
+  
+  /* Contenedor principal con scroll estable */
+  .habits-container {
+    position: relative;
+    /* Optimizaciones para scroll suave */
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    contain: layout style;
   }
   
   /* ========== BOTÓN AGREGAR HÁBITO ========== */
@@ -42,6 +56,9 @@
     padding: 2rem;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
     margin-bottom: 3rem;
+    /* OPTIMIZACIÓN: Evitar cambios de layout */
+    contain: layout style;
+    min-height: 200px;
   }
   
   .add-habit-form h3 {
@@ -54,6 +71,9 @@
   /* ========== FORMULARIOS ========== */
   .form-group {
     margin-bottom: 1.5rem;
+    /* OPTIMIZACIÓN: Evitar colapso de formularios */
+    min-height: 60px;
+    contain: layout style;
   }
   
   .form-group label {
@@ -115,18 +135,17 @@
   
   .schedule-simple-card {
     background: #f8f9fa;
-    border: 2px solid #e9ecef;
-    border-radius: 15px;
+    border-radius: 12px;
     padding: 1.5rem;
+    border: 1px solid #e9ecef;
     transition: all 0.3s ease;
   }
   
   .schedule-simple-card:hover {
     border-color: #4CAF50;
-    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.1);
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
   }
   
-  /* ========== SELECTOR DE TIPO ========== */
   .schedule-type-selector {
     margin-bottom: 1rem;
   }
@@ -134,7 +153,6 @@
   .radio-group {
     display: flex;
     gap: 1rem;
-    flex-wrap: wrap;
   }
   
   .radio-option {
@@ -142,146 +160,59 @@
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
-    background: white;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    border: 2px solid #e9ecef;
-    transition: all 0.3s ease;
-  }
-  
-  .radio-option:hover {
-    border-color: #4CAF50;
-  }
-  
-  .radio-option input[type="radio"] {
-    margin: 0;
-  }
-  
-  .radio-option input[type="radio"]:checked + span {
-    font-weight: 600;
-  }
-  
-  .radio-option:has(input:checked) {
-    background: #4CAF50;
-    border-color: #4CAF50;
-    color: white;
-  }
-  
-  /* ========== SELECTORES ESPECÍFICOS ========== */
-  .time-selector, .period-selector {
-    margin-bottom: 1rem;
-  }
-  
-  .time-selector label, .period-selector label {
-    display: block;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 0.5rem;
-  }
-  
-  .time-input-simple {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    border: 2px solid #e9ecef;
-    border-radius: 10px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    text-align: center;
-    transition: border-color 0.3s ease;
-    background: white;
-  }
-  
-  .time-input-simple:focus {
-    outline: none;
-    border-color: #4CAF50;
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
-  }
-  
-  .auto-period {
-    display: block;
-    margin-top: 0.5rem;
-    color: #666;
-    font-style: italic;
-    font-size: 0.85rem;
-  }
-  
-  .period-select-simple {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    border: 2px solid #e9ecef;
-    border-radius: 10px;
-    font-size: 1rem;
-    background: white;
-    cursor: pointer;
-    transition: border-color 0.3s ease;
-  }
-  
-  .period-select-simple:focus {
-    outline: none;
-    border-color: #4CAF50;
-  }
-  
-  /* ========== OPCIONES DE NOTIFICACIÓN SIMPLIFICADAS ========== */
-  .schedule-options-simple {
-    margin: 1rem 0;
-  }
-  
-  .notification-only {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    cursor: pointer;
-    padding: 0.5rem;
-    background: white;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
     font-weight: 500;
   }
   
-  .notification-only:hover {
-    background: #f8f9fa;
-    border-color: #4CAF50;
-  }
-  
-  .notification-only input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
+  .radio-option input[type="radio"] {
+    width: 16px;
+    height: 16px;
     accent-color: #4CAF50;
   }
   
-  .notification-only:has(input:checked) {
-    background: rgba(76, 175, 80, 0.1);
-    border-color: #4CAF50;
-    color: #2e7d32;
+  .schedule-time-input, .schedule-period-input {
+    margin-bottom: 1rem;
   }
   
-  /* ========== BOTÓN ELIMINAR SIMPLE ========== */
+  .schedule-time-input label, .schedule-period-input label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+  
+  .schedule-notification {
+    margin-bottom: 1rem;
+  }
+  
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  .checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #4CAF50;
+  }
+  
   .btn-remove-simple {
     background: #dc3545;
     color: white;
     border: none;
-    padding: 0.6rem 1.2rem;
+    padding: 0.5rem 1rem;
     border-radius: 8px;
     cursor: pointer;
     font-size: 0.9rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
+    transition: background 0.3s ease;
   }
   
   .btn-remove-simple:hover {
     background: #c82333;
-    transform: translateY(-1px);
   }
   
-  /* ========== SELECTORES DE DÍAS ========== */
+  /* ========== DÍAS PERSONALIZADOS ========== */
   .days-selector {
     display: flex;
     flex-wrap: wrap;
@@ -289,64 +220,59 @@
   }
   
   .day-checkbox {
-    background: #f8f9fa;
-    border: 2px solid #e9ecef;
-    border-radius: 10px;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+    min-width: 60px;
   }
   
   .day-checkbox:hover {
-    background: #e9ecef;
+    border-color: #4CAF50;
+    background: #f8f9fa;
   }
   
   .day-checkbox input[type="checkbox"] {
-    display: none;
+    margin-bottom: 0.3rem;
+    accent-color: #4CAF50;
   }
   
-  .day-checkbox input[type="checkbox"]:checked + span {
-    font-weight: 600;
-  }
-  
-  .day-checkbox:has(input:checked) {
-    background: #4CAF50;
-    border-color: #4CAF50;
-    color: white;
+  .day-checkbox span {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #666;
   }
   
   /* ========== BOTONES DE ACCIÓN ========== */
   .form-actions, .edit-actions {
     display: flex;
     gap: 1rem;
-    justify-content: flex-end;
+    justify-content: center;
     margin-top: 2rem;
   }
   
-  .btn-create, .btn-save, .btn-cancel {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.8rem 1.5rem;
+  .btn-create, .btn-save {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
     border: none;
-    border-radius: 10px;
+    padding: 1rem 2rem;
+    border-radius: 50px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-  }
-  
-  .btn-create, .btn-save {
-    background: #4CAF50;
-    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
   }
   
   .btn-create:hover, .btn-save:hover {
-    background: #45a049;
     transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
   }
   
   .btn-create:disabled {
@@ -358,15 +284,29 @@
   .btn-cancel {
     background: #6c757d;
     color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
   }
   
   .btn-cancel:hover {
     background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
   }
   
-  /* ========== HÁBITOS POR HORARIO - COMPACTO ========== */
+  /* ========== HÁBITOS POR HORARIO ========== */
   .habits-by-time {
     margin-bottom: 2rem;
+    /* OPTIMIZACIÓN: Evitar colapso durante scroll */
+    min-height: 200px;
   }
   
   .time-period-container {
@@ -374,8 +314,12 @@
     border-radius: 15px;
     margin-bottom: 1.5rem;
     box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    transition: all 0.3s ease;
+    transition: none;
+    /* OPTIMIZACIÓN: Evitar colapso durante scroll */
+    min-height: 100px;
+    contain: layout style;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
   
   .time-period-container.current-period {
@@ -390,10 +334,27 @@
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #dee2e6;
+    position: relative;
   }
   
   .current-period .time-period-header {
     background: linear-gradient(135deg, #e8f5e8, #d4edda);
+  }
+  
+  .current-period .time-period-header::before {
+    content: "Período Actual";
+    position: absolute;
+    top: -2px;
+    left: 1rem;
+    background: #4CAF50;
+    color: white;
+    padding: 0.2rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 5;
   }
   
   .period-info {
@@ -436,16 +397,24 @@
     font-weight: 500;
   }
   
-  /* ========== LISTA DE HÁBITOS - COMPACTA ========== */
+  /* ========== NUEVA ESTRUCTURA DE HÁBITOS ========== */
   .habits-list {
     padding: 0;
+    /* OPTIMIZACIÓN: Estabilizar lista de hábitos */
+    contain: layout style;
+    min-height: 50px;
   }
   
   .habit-card {
     padding: 1rem 1.5rem;
     border-bottom: 1px solid #f0f0f0;
-    transition: all 0.3s ease;
+    transition: background-color 0.2s ease;
+    /* OPTIMIZACIÓN: Altura mínima para estabilidad */
+    min-height: 80px;
+    contain: layout style paint;
+    will-change: auto;
     position: relative;
+    z-index: 1;
   }
   
   .habit-card:last-child {
@@ -453,197 +422,245 @@
   }
   
   .habit-card:hover {
-    background: #f8f9fa;
+    /* OPTIMIZACIÓN: Usar transform en lugar de cambios de layout */
+    transform: translateY(-1px);
   }
   
   .habit-card.completed {
     background: linear-gradient(135deg, #e8f5e8, #f0f8f0);
     opacity: 0.8;
+    /* OPTIMIZACIÓN: Mantener dimensiones */
+    min-height: 80px;
+    contain: layout style;
   }
   
   .habit-card.editing {
     background: #fff3cd;
     border: 2px solid #ffc107;
+    /* OPTIMIZACIÓN: Mantener dimensiones */
+    min-height: 80px;
+    contain: layout style;
   }
   
-  .habit-header {
+  /* NUEVO: Layout principal del hábito */
+  .habit-content {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 0.8rem;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
   }
   
-  .habit-title-section {
+  /* NUEVO: Sección del botón de completar a la izquierda */
+  .habit-action-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 80px;
+  }
+  
+  .btn-complete-schedule {
+    width: 80px;
+    height: 80px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    background: #f8f9fa;
+    border: 2px solid #dee2e6;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6c757d;
+    /* OPTIMIZACIÓN: Tamaño fijo para evitar cambios */
+    min-width: 60px;
+    min-height: 60px;
+    position: relative;
+    will-change: transform;
+    contain: layout style paint;
+  }
+  
+  .btn-complete-schedule:hover {
+    transform: scale(1.05);
+  }
+  
+  .btn-complete-schedule.completed {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    border-color: #4CAF50;
+    color: white;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+  }
+  
+  .complete-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.1rem;
+  }
+  
+  .complete-text {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  /* NUEVO: Sección de información del hábito a la derecha */
+  .habit-info-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  /* NUEVO: Header del hábito rediseñado */
+  .habit-header-redesigned {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Ajuste cuando no hay acciones (modo compacto) */
+  .habit-header-redesigned:has(.habit-actions-redesigned:empty),
+  .habit-header-redesigned:not(:has(.habit-actions-redesigned)) {
+    justify-content: flex-start;
+  }
+  
+  .habit-title-section-redesigned {
     display: flex;
     align-items: flex-start;
     gap: 0.8rem;
     flex: 1;
   }
   
-  .category-icon {
-    font-size: 1.3rem;
+  .category-icon-redesigned {
+    font-size: 1.5rem;
     margin-top: 0.1rem;
-    flex-shrink: 0;
   }
   
-  .habit-info {
+  .habit-details {
     flex: 1;
-    min-width: 0;
   }
   
-  .habit-title {
+  .habit-title-redesigned {
     font-size: 1.1rem;
+    font-weight: 600;
     color: #333;
     margin: 0 0 0.3rem 0;
-    font-weight: 600;
     line-height: 1.3;
   }
   
-  .habit-description {
-    color: #666;
-    margin: 0;
+  .habit-description-redesigned {
     font-size: 0.85rem;
-    line-height: 1.3;
+    color: #666;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.4;
   }
   
-  .habit-actions {
+  /* NUEVO: Metadatos en línea */
+  .habit-meta-redesigned {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.75rem;
+    color: #666;
+    /* OPTIMIZACIÓN: Evitar wrap innecesario */
+    min-height: 24px;
+    contain: layout style;
+  }
+  
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #f8f9fa;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+  
+  .meta-item.schedule {
+    background: #e3f2fd;
+    color: #1976d2;
+  }
+  
+  .meta-item.frequency {
+    background: #f3e5f5;
+    color: #7b1fa2;
+  }
+  
+  .meta-item.category {
+    background: #e8f5e8;
+    color: #2e7d32;
+  }
+  
+  .meta-item.streak {
+    background: rgba(255, 107, 53, 0.1);
+    color: #ff6b35;
+    font-weight: 600;
+  }
+  
+  .meta-icon {
+    font-size: 0.8rem;
+  }
+  
+  /* Acciones del hábito (editar/eliminar) */
+  .habit-actions-redesigned {
     display: flex;
     gap: 0.3rem;
+    align-self: flex-start;
+    /* OPTIMIZACIÓN: Evitar cambios de layout */
+    min-width: 60px;
     flex-shrink: 0;
   }
   
   .btn-icon {
-    background: none;
+    background: transparent;
     border: none;
-    font-size: 1.1rem;
-    padding: 0.4rem;
+    padding: 0.3rem;
     border-radius: 6px;
     cursor: pointer;
-    transition: background 0.2s ease;
-  }
-  
-  .btn-icon:hover {
-    background: rgba(0, 0, 0, 0.1);
-  }
-  
-  .btn-icon.edit:hover {
-    background: rgba(255, 193, 7, 0.2);
-  }
-  
-  .btn-icon.delete:hover {
-    background: rgba(220, 53, 69, 0.2);
-  }
-  
-  /* ========== BOTONES DE COMPLETADO POR HORARIO - COMPACTO ========== */
-  .habit-schedules-with-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
-    margin-bottom: 1rem;
-    align-items: center;
-  }
-  
-  .schedule-completion-item {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.5rem 0.8rem;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
     transition: all 0.3s ease;
-    min-width: fit-content;
-  }
-  
-  .schedule-completion-item:hover {
-    background: #e9ecef;
-    border-color: #4CAF50;
-  }
-  
-  .btn-complete-schedule {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: white;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    padding: 0.4rem 0.6rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.85rem;
-    flex-shrink: 0;
-    min-width: 70px;
-  }
-  
-  .btn-complete-schedule:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .btn-complete-schedule.completed {
-    background: #4CAF50;
-    border-color: #4CAF50;
-    color: white;
-  }
-  
-  .complete-icon {
     font-size: 1rem;
   }
   
-  .complete-text {
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-  
-  .schedule-info {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    flex: 1;
-  }
-  
-  .schedule-time {
-    font-weight: 600;
-    color: #333;
-    font-size: 0.9rem;
-  }
-  
-  .notification-icon {
-    color: #007bff;
-    font-size: 0.8rem;
-  }
-  
-  /* ========== METADATOS DE HÁBITO - COMPACTOS ========== */
-  .habit-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
-    font-size: 0.8rem;
-    color: #666;
-    margin-top: 0.5rem;
-  }
-  
-  .frequency, .category, .streak {
-    display: flex;
-    align-items: center;
-    gap: 0.2rem;
+  .btn-icon:hover {
     background: #f8f9fa;
-    padding: 0.2rem 0.5rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
+    transform: scale(1.1);
   }
   
-  .streak {
-    color: #ff6b35;
-    font-weight: 600;
-    background: rgba(255, 107, 53, 0.1);
+  .btn-icon.edit:hover {
+    background: #e3f2fd;
   }
   
-  /* ========== ESTADO VACÍO ========== */
+  .btn-icon.delete:hover {
+    background: #ffebee;
+  }
+  
+  /* ========== FORMULARIO DE EDICIÓN ========== */
+  .edit-form {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+    /* OPTIMIZACIÓN: Altura mínima para estabilidad */
+    min-height: 200px;
+    contain: layout style;
+  }
+  
+  /* ========== ESTADOS VACÍOS ========== */
   .empty-state {
     text-align: center;
     padding: 3rem 2rem;
     color: #666;
+    /* OPTIMIZACIÓN: Altura fija para evitar colapso */
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
   
   .empty-icon {
@@ -661,29 +678,59 @@
     font-size: 1rem;
   }
   
-  /* ========== MENSAJE CUANDO NO HAY HÁBITOS ========== */
   .no-habits {
     padding: 2rem;
     text-align: center;
     color: #666;
     font-style: italic;
+    /* OPTIMIZACIÓN: Mensaje sin hábitos estable */
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
-  /* ========== FORMULARIO DE EDICIÓN ========== */
-  .edit-form {
-    background: white;
-    border-radius: 15px;
-    padding: 1.5rem;
-    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+  /* ========== OPTIMIZACIONES AVANZADAS ========== */
+  
+  /* Contenido crítico above-the-fold */
+  .current-period {
+    /* Priorizar renderizado */
+    contain: layout style paint;
+    will-change: auto;
+  }
+  
+  /* Lazy loading para contenido no visible */
+  .time-period-container:not(.current-period) {
+    /* Reducir cálculos para períodos no actuales */
+    contain: layout style paint;
+  }
+  
+  /* Optimizar animaciones */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   
   /* ========== RESPONSIVE DESIGN ========== */
   @media (max-width: 768px) {
+    .current-period .time-period-header::before {
+      top: -8px;
+      left: 0.5rem;
+      font-size: 0.6rem;
+      padding: 0.1rem 0.5rem;
+    }
+  
     .time-period-header {
       flex-direction: column;
       gap: 0.8rem;
       text-align: center;
-      padding: 0.8rem 1rem;
+      padding: 1rem;
     }
   
     .time-period-header h3 {
@@ -692,32 +739,45 @@
   
     .habit-card {
       padding: 0.8rem 1rem;
+      /* OPTIMIZACIÓN: Altura mínima mayor en móviles */
+      min-height: 120px;
     }
   
-    .habit-header {
-      margin-bottom: 0.6rem;
-    }
-  
-    .habit-title {
-      font-size: 1rem;
-    }
-  
-    .habit-description {
-      font-size: 0.8rem;
-    }
-  
-    .habit-schedules-with-buttons {
+    .habit-content {
       flex-direction: column;
-      gap: 0.6rem;
+      align-items: flex-start;
+      gap: 1rem;
     }
   
-    .schedule-completion-item {
-      justify-content: space-between;
-      padding: 0.6rem;
+    .habit-action-section {
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-width: auto;
     }
   
     .btn-complete-schedule {
-      min-width: 80px;
+      width: 50px;
+      height: 50px;
+    }
+  
+    .habit-header-redesigned {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  
+    .habit-actions-redesigned {
+      align-self: flex-end;
+    }
+  
+    .habit-meta-redesigned {
+      gap: 0.4rem;
+    }
+  
+    .meta-item {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
     }
   
     .form-actions, .edit-actions {
@@ -728,12 +788,18 @@
       flex-direction: column;
     }
   
-    .habit-meta {
-      gap: 0.5rem;
+    .days-selector {
+      gap: 0.3rem;
     }
   
-    .frequency, .category, .streak {
-      font-size: 0.7rem;
-      padding: 0.1rem 0.4rem;
+    .day-checkbox {
+      min-width: 50px;
+      padding: 0.3rem;
+    }
+  
+    .habits-container {
+      /* OPTIMIZACIÓN: Scroll optimizado para móvil */
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
     }
   }

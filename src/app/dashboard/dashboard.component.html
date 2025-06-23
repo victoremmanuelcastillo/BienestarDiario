@@ -1,4 +1,4 @@
-<!-- dashboard.component.html - Template simplificado -->
+<!-- dashboard.component.html - Template limpio sin botones de navegación -->
 <div class="dashboard-container">
   
   <!-- Header con saludo -->
@@ -48,29 +48,10 @@
     </div>
   </div>
 
-  <!-- Navegación rápida -->
-  <div class="quick-navigation">
-    <button 
-      class="nav-button" 
-      [class.active]="!showHabitsManager"
-      (click)="showHabitsManager = false">
-      <span class="nav-icon">🏠</span>
-      <span>Dashboard</span>
-    </button>
-    
-    <button 
-      class="nav-button" 
-      [class.active]="showHabitsManager"
-      (click)="toggleHabitsManager()">
-      <span class="nav-icon">🎯</span>
-      <span>Gestionar Hábitos</span>
-    </button>
-  </div>
-
-  <!-- Vista del Dashboard Principal -->
+  <!-- Vista del Dashboard Principal (SIEMPRE VISIBLE) -->
   <div class="dashboard-main" *ngIf="!showHabitsManager">
     
-    <!-- Resumen de hábitos del día (usando el componente pero en modo compacto) -->
+    <!-- Resumen de hábitos del día -->
     <div class="habits-summary-section">
       <h2 class="section-title">📋 Tus Hábitos de Hoy</h2>
       <app-habits-manager
@@ -82,7 +63,7 @@
       </app-habits-manager>
       
       <div class="view-all-section">
-        <button class="btn-view-all" (click)="toggleHabitsManager()">
+        <button class="btn-view-all" (click)="showHabitsManager = true">
           Ver y Gestionar Todos los Hábitos →
         </button>
       </div>
@@ -108,9 +89,12 @@
     </div>
   </div>
 
-  <!-- Vista del Gestor de Hábitos Completo -->
+  <!-- Vista del Gestor de Hábitos Completo (SOLO cuando se activa) -->
   <div class="habits-manager-section" *ngIf="showHabitsManager">
     <div class="section-header">
+      <button class="btn-back" (click)="showHabitsManager = false">
+        ← Volver al Dashboard
+      </button>
       <h2 class="section-title">🎯 Gestión Completa de Hábitos</h2>
       <p class="section-subtitle">Crea, edita y organiza todos tus hábitos diarios</p>
     </div>
